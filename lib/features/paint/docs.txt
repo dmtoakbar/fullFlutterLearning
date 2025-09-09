@@ -1,0 +1,532 @@
+Basic CustomPaint Structure:-
+CustomPaint(
+  size: Size(300, 300), // Canvas size
+  painter: MyCustomPainter(), // Handles background painting
+  foregroundPainter: MyForegroundPainter(), // Handles foreground painting
+  child: Container(), // Optional child widget
+)
+All Painting Methods:-
+@override
+void paint(Canvas canvas, Size size) {
+  final paint = Paint()
+    ..color = Colors.blue
+    ..style = PaintingStyle.fill
+    ..strokeWidth = 2.0
+    ..strokeCap = StrokeCap.round
+    ..strokeJoin = StrokeJoin.round
+    ..blendMode = BlendMode.srcOver
+    ..shader = gradient.createShader(rect)
+    ..maskFilter = MaskFilter.blur(BlurStyle.normal, 10.0)
+    ..colorFilter = ColorFilter.mode(Colors.red, BlendMode.modulate)
+    ..imageFilter = ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0)
+    ..isAntiAlias = true;
+
+  // Drawing methods
+  canvas.drawLine(Offset.zero, Offset(size.width, size.height), paint);
+  canvas.drawRect(Rect.fromLTWH(0, 0, 100, 100), paint);
+  canvas.drawCircle(Offset(size.width/2, size.height/2), 50, paint);
+  canvas.drawOval(Rect.fromCenter(center: center, width: 100, height: 50), paint);
+  canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(10)), paint);
+  canvas.drawArc(rect, startAngle, sweepAngle, useCenter, paint);
+  canvas.drawPath(path, paint);
+  canvas.drawImage(image, offset, paint);
+  canvas.drawImageRect(image, srcRect, dstRect, paint);
+  canvas.drawPoints(PointMode.points, points, paint);
+  canvas.drawRawPoints(PointMode.polygon, float32List, paint);
+  canvas.drawVertices(vertices, BlendMode.srcOver, paint);
+  canvas.drawAtlas(image, transforms, rects, colors, BlendMode.srcOver, rect, paint);
+  canvas.drawShadow(path, color, elevation, transparentOccluder);
+  canvas.drawColor(color, BlendMode.srcOver);
+  canvas.drawDRRect(outerRRect, innerRRect, paint);
+  canvas.drawParagraph(paragraph, offset);
+
+  // Transformation methods
+  canvas.save();
+  canvas.restore();
+  canvas.saveLayer(bounds, paint);
+  canvas.translate(dx, dy);
+  canvas.rotate(angle);
+  canvas.scale(sx, sy);
+  canvas.skew(sx, sy);
+  canvas.transform(matrix4);
+  canvas.clipRect(rect);
+  canvas.clipRRect(rrect);
+  canvas.clipPath(path);
+  canvas.getSaveCount();
+  canvas.restoreToCount(saveCount);
+
+  // Utility methods
+  canvas.getDestinationClipBounds();
+  canvas.getLocalClipBounds();
+  canvas.quickReject(rect);
+  canvas.quickRejectPath(path);
+}
+Path Methods:-
+final path = Path()
+  ..moveTo(100, 100)
+  ..lineTo(200, 100)
+  ..relativeLineTo(50, 50)
+  ..quadraticBezierTo(150, 200, 250, 150)
+  ..cubicTo(100, 200, 200, 250, 150, 300)
+  ..conicTo(100, 100, 200, 200, 1.0)
+  ..arcTo(rect, startAngle, sweepAngle, false)
+  ..arcToPoint(offset, radius: radius, largeArc: largeArc, clockwise: clockwise)
+  ..relativeArcToPoint(offset, radius: radius)
+  ..addRect(rect)
+  ..addOval(rect)
+  ..addArc(rect, startAngle, sweepAngle)
+  ..addPolygon(points, close)
+  ..addRRect(rrect)
+  ..addPath(path2, offset)
+  ..close()
+  ..reset()
+  ..contains(offset)
+  ..shift(offset)
+  ..transform(matrix4.storage)
+  ..getBounds()
+  ..computeMetrics();
+  Basic Examples:-
+  1. Simple Shape Painter
+  class BasicShapePainter extends CustomPainter {
+    @override
+    void paint(Canvas canvas, Size size) {
+      final center = Offset(size.width / 2, size.height / 2);
+      final paint = Paint()
+        ..color = Colors.blue
+        ..style = PaintingStyle.fill;
+
+      // Draw circle
+      canvas.drawCircle(center, 50, paint);
+
+      // Draw rectangle
+      paint.color = Colors.red;
+      canvas.drawRect(
+        Rect.fromCenter(center: center, width: 100, height: 60),
+        paint,
+      );
+    }
+
+    @override
+    bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  }
+  2. Gradient Background
+  class GradientPainter extends CustomPainter {
+    @override
+    void paint(Canvas canvas, Size size) {
+      final rect = Rect.fromPoints(Offset.zero, Offset(size.width, size.height));
+      final gradient = LinearGradient(
+        colors: [Colors.blue, Colors.purple],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+
+      final paint = Paint()..shader = gradient.createShader(rect);
+      canvas.drawRect(rect, paint);
+    }
+
+    @override
+    bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  }
+  3. Animated Circle
+  class AnimatedCirclePainter extends CustomPainter {
+    final double progress;
+
+    AnimatedCirclePainter(this.progress);
+
+    @override
+    void paint(Canvas canvas, Size size) {
+      final center = Offset(size.width / 2, size.height / 2);
+      final radius = size.width / 2 * progress;
+
+      final paint = Paint()
+        ..color = Colors.blue.withOpacity(0.5)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 10
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawCircle(center, radius, paint);
+    }
+
+    @override
+    bool shouldRepaint(covariant AnimatedCirclePainter oldDelegate) =>
+        oldDelegate.progress != progress;
+  }
+  Advanced Examples:-
+  1. Wave Animation
+  class WavePainter extends CustomPainter {
+    final double waveValue;
+    final Color waveColor;
+
+    WavePainter(this.waveValue, this.waveColor);
+
+    @override
+    void paint(Canvas canvas, Size size) {
+      final paint = Paint()
+        ..color = waveColor
+        ..style = PaintingStyle.fill
+        ..isAntiAlias = true;
+
+      final path = Path();
+      final waveHeight = 20.0;
+      final baseHeight = size.height * 0.7;
+
+      path.moveTo(0, baseHeight);
+
+      for (double i = 0; i <= size.width; i++) {
+        final y = baseHeight +
+            sin((i / size.width * 2 * pi) + (waveValue * 2 * pi)) * waveHeight;
+        path.lineTo(i, y);
+      }
+
+      path.lineTo(size.width, size.height);
+      path.lineTo(0, size.height);
+      path.close();
+
+      canvas.drawPath(path, paint);
+    }
+
+    @override
+    bool shouldRepaint(covariant WavePainter oldDelegate) =>
+        oldDelegate.waveValue != waveValue || oldDelegate.waveColor != waveColor;
+  }
+  2. Particle System
+  class ParticleSystemPainter extends CustomPainter {
+    final List<Particle> particles;
+
+    ParticleSystemPainter(this.particles);
+
+    @override
+    void paint(Canvas canvas, Size size) {
+      for (final particle in particles) {
+        final paint = Paint()
+          ..color = particle.color.withOpacity(particle.opacity)
+          ..style = PaintingStyle.fill;
+
+        canvas.save();
+        canvas.translate(particle.position.dx, particle.position.dy);
+        canvas.rotate(particle.rotation);
+
+        canvas.drawCircle(
+          Offset.zero,
+          particle.radius,
+          paint,
+        );
+
+        canvas.restore();
+      }
+    }
+
+    @override
+    bool shouldRepaint(covariant ParticleSystemPainter oldDelegate) =>
+        oldDelegate.particles != particles;
+  }
+
+  class Particle {
+    final Offset position;
+    final double radius;
+    final Color color;
+    final double opacity;
+    final double rotation;
+
+    Particle({
+      required this.position,
+      required this.radius,
+      required this.color,
+      required this.opacity,
+      required this.rotation,
+    });
+  }
+  3. Custom Chart/Graph
+  class LineChartPainter extends CustomPainter {
+    final List<double> data;
+    final Color lineColor;
+    final Color fillColor;
+
+    LineChartPainter(this.data, this.lineColor, this.fillColor);
+
+    @override
+    void paint(Canvas canvas, Size size) {
+      if (data.length < 2) return;
+
+      final paint = Paint()
+        ..color = lineColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..isAntiAlias = true;
+
+      final fillPaint = Paint()
+        ..color = fillColor.withOpacity(0.3)
+        ..style = PaintingStyle.fill;
+
+      final path = Path();
+      final fillPath = Path();
+
+      final xStep = size.width / (data.length - 1);
+      final maxValue = data.reduce((a, b) => a > b ? a : b);
+      final minValue = data.reduce((a, b) => a < b ? a : b);
+      final valueRange = maxValue - minValue;
+
+      // Draw line
+      for (int i = 0; i < data.length; i++) {
+        final x = i * xStep;
+        final y = size.height - ((data[i] - minValue) / valueRange * size.height);
+
+        if (i == 0) {
+          path.moveTo(x, y);
+          fillPath.moveTo(x, size.height);
+          fillPath.lineTo(x, y);
+        } else {
+          path.lineTo(x, y);
+          fillPath.lineTo(x, y);
+        }
+      }
+
+      // Close fill path
+      fillPath.lineTo(size.width, size.height);
+      fillPath.close();
+
+      canvas.drawPath(fillPath, fillPaint);
+      canvas.drawPath(path, paint);
+
+      // Draw data points
+      for (int i = 0; i < data.length; i++) {
+        final x = i * xStep;
+        final y = size.height - ((data[i] - minValue) / valueRange * size.height);
+
+        canvas.drawCircle(Offset(x, y), 4, paint..style = PaintingStyle.fill);
+      }
+    }
+
+    @override
+    bool shouldRepaint(covariant LineChartPainter oldDelegate) =>
+        oldDelegate.data != data ||
+        oldDelegate.lineColor != lineColor ||
+        oldDelegate.fillColor != fillColor;
+  }
+  4. Advanced Custom Button with Effects
+  class AdvancedButtonPainter extends CustomPainter {
+    final double pressedProgress;
+    final bool isHovered;
+    final Color buttonColor;
+
+    AdvancedButtonPainter({
+      required this.pressedProgress,
+      required this.isHovered,
+      required this.buttonColor,
+    });
+
+    @override
+    void paint(Canvas canvas, Size size) {
+      final rect = Rect.fromPoints(Offset.zero, Offset(size.width, size.height));
+      final borderRadius = BorderRadius.circular(12);
+
+      // Base button
+      final basePaint = Paint()
+        ..color = buttonColor
+        ..style = PaintingStyle.fill;
+
+      // Shadow effect
+      if (pressedProgress < 1.0) {
+        final shadowPaint = Paint()
+          ..color = Colors.black.withOpacity(0.2 * (1 - pressedProgress))
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, 8.0);
+
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(rect.shift(Offset(0, 4)), borderRadius),
+          shadowPaint,
+        );
+      }
+
+      // Pressed effect
+      final pressedOffset = Offset(0, 4 * pressedProgress);
+      final pressedRect = rect.shift(pressedOffset);
+
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(pressedRect, borderRadius),
+        basePaint,
+      );
+
+      // Hover effect
+      if (isHovered) {
+        final hoverPaint = Paint()
+          ..color = Colors.white.withOpacity(0.1)
+          ..style = PaintingStyle.fill;
+
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(pressedRect, borderRadius),
+          hoverPaint,
+        );
+      }
+
+      // Highlight effect
+      final highlightPaint = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.white.withOpacity(0.3),
+            Colors.transparent,
+          ],
+        ).createShader(pressedRect);
+
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(pressedRect, borderRadius),
+        highlightPaint,
+      );
+    }
+
+    @override
+    bool shouldRepaint(covariant AdvancedButtonPainter oldDelegate) =>
+        oldDelegate.pressedProgress != pressedProgress ||
+        oldDelegate.isHovered != isHovered ||
+        oldDelegate.buttonColor != buttonColor;
+  }
+  5. 3D Perspective Transformation
+  class PerspectivePainter extends CustomPainter {
+    final double perspective;
+    final Matrix4 transformation;
+
+    PerspectivePainter(this.perspective, this.transformation);
+
+    @override
+    void paint(Canvas canvas, Size size) {
+      canvas.save();
+
+      // Apply perspective transformation
+      canvas.transform(transformation.storage);
+
+      // Draw 3D-like objects
+      final paint = Paint()
+        ..color = Colors.blue
+        ..style = PaintingStyle.fill
+        ..isAntiAlias = true;
+
+      // Draw a cube-like shape
+      final points = [
+        Offset(50, 50),
+        Offset(150, 50),
+        Offset(150, 150),
+        Offset(50, 150),
+      ];
+
+      final path = Path()
+        ..addPolygon(points, true);
+
+      canvas.drawPath(path, paint);
+
+      // Add shading for 3D effect
+      final gradientPaint = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.blue.shade700,
+            Colors.blue.shade300,
+          ],
+        ).createShader(Rect.fromPoints(Offset(50, 50), Offset(150, 150)));
+
+      canvas.drawPath(path, gradientPaint);
+
+      canvas.restore();
+    }
+
+    @override
+    bool shouldRepaint(covariant PerspectivePainter oldDelegate) =>
+        oldDelegate.perspective != perspective ||
+        oldDelegate.transformation != transformation;
+  }
+  Performance Optimization:-
+  1. Use shouldRepaint Wisely
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    // Only repaint if specific properties change
+    return oldDelegate.someProperty != someProperty;
+  }
+  2. Precompute Expensive Operations
+  class OptimizedPainter extends CustomPainter {
+    final List<double> data;
+    late final Path _cachedPath;
+
+    OptimizedPainter(this.data) {
+      _cachedPath = _computePath(data);
+    }
+
+    Path _computePath(List<double> data) {
+      final path = Path();
+      // Compute path once
+      return path;
+    }
+
+    @override
+    void paint(Canvas canvas, Size size) {
+      canvas.drawPath(_cachedPath, Paint());
+    }
+  }
+  3. Use saveLayer Sparingly
+  // Avoid this when possible
+  canvas.saveLayer(bounds, paint);
+
+  // Use this instead for simple effects
+  paint..colorFilter = ColorFilter.mode(color, BlendMode.modulate);
+
+  Best Practices :-
+  Use isAntiAlias = true for smoother edges
+
+  Precompute expensive operations in constructor
+
+  Implement shouldRepaint efficiently
+
+  Use save/restore for complex transformations
+
+  Consider using RepaintBoundary for complex paintings
+
+  Test performance on target devices
+
+  Complete Example Usage:
+  class CustomPaintExample extends StatefulWidget {
+    @override
+    _CustomPaintExampleState createState() => _CustomPaintExampleState();
+  }
+
+  class _CustomPaintExampleState extends State<CustomPaintExample>
+      with SingleTickerProviderStateMixin {
+    late AnimationController _controller;
+    late Animation<double> _animation;
+
+    @override
+    void initState() {
+      super.initState();
+      _controller = AnimationController(
+        vsync: this,
+        duration: Duration(seconds: 2),
+      )..repeat(reverse: true);
+
+      _animation = CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      );
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        body: Center(
+          child: AnimatedBuilder(
+            animation: _animation,
+            builder: (context, child) {
+              return CustomPaint(
+                size: Size(300, 300),
+                painter: WavePainter(_animation.value, Colors.blue),
+              );
+            },
+          ),
+        ),
+      );
+    }
+
+    @override
+    void dispose() {
+      _controller.dispose();
+      super.dispose();
+    }
+  }

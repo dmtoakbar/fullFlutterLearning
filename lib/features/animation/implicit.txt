@@ -1,0 +1,234 @@
+1. AnimatedContainer Example
+import 'package:flutter/material.dart';
+
+class AnimatedContainerExample extends StatefulWidget {
+  @override
+  _AnimatedContainerExampleState createState() =>
+      _AnimatedContainerExampleState();
+}
+
+class _AnimatedContainerExampleState extends State<AnimatedContainerExample> {
+  bool _toggled = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("AnimatedContainer")),
+      body: Center(
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              _toggled = !_toggled;
+            });
+          },
+          child: AnimatedContainer(
+            duration: Duration(seconds: 1),
+            width: _toggled ? 200 : 100,
+            height: _toggled ? 200 : 100,
+            color: _toggled ? Colors.blue : Colors.red,
+            curve: Curves.easeInOut,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+2. AnimatedOpacity Example
+class AnimatedOpacityExample extends StatefulWidget {
+  @override
+  _AnimatedOpacityExampleState createState() => _AnimatedOpacityExampleState();
+}
+
+class _AnimatedOpacityExampleState extends State<AnimatedOpacityExample> {
+  bool _visible = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("AnimatedOpacity")),
+      body: Center(
+        child: AnimatedOpacity(
+          opacity: _visible ? 1.0 : 0.2,
+          duration: Duration(seconds: 1),
+          child: Container(width: 150, height: 150, color: Colors.green),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _visible = !_visible;
+          });
+        },
+        child: Icon(Icons.visibility),
+      ),
+    );
+  }
+}
+
+3. AnimatedAlign Example
+class AnimatedAlignExample extends StatefulWidget {
+  @override
+  _AnimatedAlignExampleState createState() => _AnimatedAlignExampleState();
+}
+
+class _AnimatedAlignExampleState extends State<AnimatedAlignExample> {
+  bool _topLeft = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("AnimatedAlign")),
+      body: Container(
+        color: Colors.grey[300],
+        child: AnimatedAlign(
+          duration: Duration(seconds: 1),
+          alignment: _topLeft ? Alignment.topLeft : Alignment.bottomRight,
+          curve: Curves.easeInOut,
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                _topLeft = !_topLeft;
+              });
+            },
+            child: Container(width: 100, height: 100, color: Colors.purple),
+          ),
+        ),
+      ),
+    );
+  }
+}
+4. AnimatedPositioned Example
+class AnimatedPositionedExample extends StatefulWidget {
+  @override
+  _AnimatedPositionedExampleState createState() =>
+      _AnimatedPositionedExampleState();
+}
+
+class _AnimatedPositionedExampleState extends State<AnimatedPositionedExample> {
+  bool _moved = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("AnimatedPositioned")),
+      body: Stack(
+        children: [
+          AnimatedPositioned(
+            duration: Duration(seconds: 1),
+            left: _moved ? 200 : 20,
+            top: _moved ? 400 : 20,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _moved = !_moved;
+                });
+              },
+              child: Container(width: 100, height: 100, color: Colors.orange),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+5. AnimatedPadding Example
+class AnimatedPaddingExample extends StatefulWidget {
+  @override
+  _AnimatedPaddingExampleState createState() => _AnimatedPaddingExampleState();
+}
+
+class _AnimatedPaddingExampleState extends State<AnimatedPaddingExample> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("AnimatedPadding")),
+      body: Center(
+        child: AnimatedPadding(
+          duration: Duration(seconds: 1),
+          padding: EdgeInsets.all(_expanded ? 50 : 10),
+          curve: Curves.easeInOut,
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                _expanded = !_expanded;
+              });
+            },
+            child: Container(width: 150, height: 150, color: Colors.teal),
+          ),
+        ),
+      ),
+    );
+  }
+}
+6. AnimatedCrossFade Example
+class AnimatedCrossFadeExample extends StatefulWidget {
+  @override
+  _AnimatedCrossFadeExampleState createState() =>
+      _AnimatedCrossFadeExampleState();
+}
+
+class _AnimatedCrossFadeExampleState extends State<AnimatedCrossFadeExample> {
+  bool _first = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("AnimatedCrossFade")),
+      body: Center(
+        child: AnimatedCrossFade(
+          duration: Duration(seconds: 1),
+          firstChild: Container(width: 150, height: 150, color: Colors.red),
+          secondChild: Container(width: 150, height: 150, color: Colors.blue),
+          crossFadeState:
+              _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _first = !_first;
+          });
+        },
+        child: Icon(Icons.swap_horiz),
+      ),
+    );
+  }
+}
+7. TweenAnimationBuilder Example
+class TweenAnimationBuilderExample extends StatefulWidget {
+  @override
+  _TweenAnimationBuilderExampleState createState() =>
+      _TweenAnimationBuilderExampleState();
+}
+
+class _TweenAnimationBuilderExampleState
+    extends State<TweenAnimationBuilderExample> {
+  bool _big = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("TweenAnimationBuilder")),
+      body: Center(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 100, end: _big ? 200 : 100),
+          duration: Duration(seconds: 1),
+          builder: (context, size, child) {
+            return Container(width: size, height: size, color: Colors.green);
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _big = !_big;
+          });
+        },
+        child: Icon(Icons.play_arrow),
+      ),
+    );
+  }
+}

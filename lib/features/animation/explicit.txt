@@ -1,0 +1,231 @@
+1. AnimationController Example
+import 'package:flutter/material.dart';
+
+class AnimationControllerExample extends StatefulWidget {
+  @override
+  _AnimationControllerExampleState createState() =>
+      _AnimationControllerExampleState();
+}
+
+class _AnimationControllerExampleState
+    extends State<AnimationControllerExample> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true); // loop animation
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("AnimationController")),
+      body: Center(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Container(
+              width: 100 + (_controller.value * 100),
+              height: 100 + (_controller.value * 100),
+              color: Colors.blue,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+2. Animation<T> Example
+class AnimationTExample extends StatefulWidget {
+  @override
+  _AnimationTExampleState createState() => _AnimationTExampleState();
+}
+
+class _AnimationTExampleState extends State<AnimationTExample>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    _animation = Tween<double>(begin: 0, end: 300).animate(_controller);
+
+    _controller.repeat(reverse: true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Animation<T>")),
+      body: AnimatedBuilder(
+        animation: _animation,
+        builder: (context, child) {
+          return Container(width: _animation.value, height: 50, color: Colors.red);
+        },
+      ),
+    );
+  }
+}
+
+3. Tween<T> Example
+class TweenExample extends StatefulWidget {
+  @override
+  _TweenExampleState createState() => _TweenExampleState();
+}
+
+class _TweenExampleState extends State<TweenExample>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Color?> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 3));
+    _animation =
+        ColorTween(begin: Colors.blue, end: Colors.orange).animate(_controller);
+
+    _controller.repeat(reverse: true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Tween<T>")),
+      body: Center(
+        child: AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            return Container(width: 150, height: 150, color: _animation.value);
+          },
+        ),
+      ),
+    );
+  }
+}
+4. CurvedAnimation Example
+class CurvedAnimationExample extends StatefulWidget {
+  @override
+  _CurvedAnimationExampleState createState() => _CurvedAnimationExampleState();
+}
+
+class _CurvedAnimationExampleState extends State<CurvedAnimationExample>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2));
+
+    _animation =
+        CurvedAnimation(parent: _controller, curve: Curves.bounceOut);
+
+    _controller.repeat(reverse: false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("CurvedAnimation")),
+      body: Center(
+        child: ScaleTransition(
+          scale: _animation,
+          child: Container(width: 100, height: 100, color: Colors.green),
+        ),
+      ),
+    );
+  }
+}
+5. AnimatedBuilder Example
+class AnimatedBuilderExample extends StatefulWidget {
+  @override
+  _AnimatedBuilderExampleState createState() => _AnimatedBuilderExampleState();
+}
+
+class _AnimatedBuilderExampleState extends State<AnimatedBuilderExample>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _rotation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 3))
+          ..repeat();
+    _rotation = Tween<double>(begin: 0, end: 2 * 3.14).animate(_controller);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("AnimatedBuilder")),
+      body: Center(
+        child: AnimatedBuilder(
+          animation: _rotation,
+          builder: (context, child) {
+            return Transform.rotate(
+              angle: _rotation.value,
+              child: child,
+            );
+          },
+          child: Icon(Icons.star, size: 100, color: Colors.purple),
+        ),
+      ),
+    );
+  }
+}
+6. AnimatedWidget Example
+class MyAnimatedBox extends AnimatedWidget {
+  const MyAnimatedBox({Key? key, required Animation<double> animation})
+      : super(key: key, listenable: animation);
+
+  @override
+  Widget build(BuildContext context) {
+    final animation = listenable as Animation<double>;
+    return Container(
+      width: animation.value,
+      height: animation.value,
+      color: Colors.teal,
+    );
+  }
+}
+
+class AnimatedWidgetExample extends StatefulWidget {
+  @override
+  _AnimatedWidgetExampleState createState() => _AnimatedWidgetExampleState();
+}
+
+class _AnimatedWidgetExampleState extends State<AnimatedWidgetExample>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _sizeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..repeat(reverse: true);
+    _sizeAnimation = Tween<double>(begin: 50, end: 200).animate(_controller);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("AnimatedWidget")),
+      body: Center(child: MyAnimatedBox(animation: _sizeAnimation)),
+    );
+  }
+}
