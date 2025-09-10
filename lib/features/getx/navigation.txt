@@ -1,0 +1,171 @@
+==============Basic Navigation================================
+➡️ Push (go to new screen)
+Get.to(() => SecondScreen());
+
+Pop (go back)
+Get.back();
+
+Replace current screen
+Get.off(() => SecondScreen());
+
+🔄 Replace all previous screens
+Get.offAll(() => SecondScreen());
+
+3. 📌 Passing Data Between Screens
+Passing arguments
+Get.to(() => SecondScreen(), arguments: "Hello from Home!");
+⬅️ Receiving arguments
+class SecondScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final data = Get.arguments;
+    return Scaffold(
+      body: Center(child: Text("Data: $data")),
+    );
+  }
+}
+
+
+=================get name navigation=========================
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+void main() {
+  runApp(
+    GetMaterialApp(
+      initialRoute: '/',
+      getPages: [
+        GetPage(name: '/', page: () => HomeScreen()),
+        GetPage(name: '/second', page: () => SecondScreen()),
+      ],
+    ),
+  );
+}
+
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Home")),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Get.toNamed('/second', arguments: "Data from Home!");
+          },
+          child: Text("Go to Second"),
+        ),
+      ),
+    );
+  }
+}
+
+class SecondScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final data = Get.arguments;
+    return Scaffold(
+      appBar: AppBar(title: Text("Second")),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Received: $data"),
+            ElevatedButton(
+              onPressed: () => Get.back(result: "Result from Second"),
+              child: Text("Go Back with Result"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Navigate with:
+Get.toNamed('/second');
+Send data:
+Get.toNamed('/second', arguments: "Hello Named Route");
+final data = Get.arguments;
+
+
+
+6. 📌 Middleware (Route Guards)
+Use middleware to control access (e.g., authentication).
+class AuthMiddleware extends GetMiddleware {
+  @override
+  RouteSettings? redirect(String? route) {
+    // if not logged in, redirect
+    if (!isLoggedIn) {
+      return const RouteSettings(name: '/login');
+    }
+    return null;
+  }
+}
+
+GetPage(
+  name: '/profile',
+  page: () => ProfileScreen(),
+  middlewares: [AuthMiddleware()],
+);
+
+5. 📌 Navigation with Results
+Pass back values:
+var result = await Get.to(() => SecondScreen());
+print("Result: $result");
+Return from second screen:
+Get.back(result: "This is from second screen");
+
+
+Snackbar
+Get.snackbar("Title", "Message", snackPosition: SnackPosition.BOTTOM);
+
+Dialog
+Get.defaultDialog(
+  title: "Hello",
+  middleText: "This is a dialog",
+  onConfirm: () => Get.back(),
+);
+
+BottomSheet
+
+Get.bottomSheet(
+  Container(
+    color: Colors.white,
+    child: Wrap(
+      children: [
+        ListTile(leading: Icon(Icons.music_note), title: Text("Music")),
+        ListTile(leading: Icon(Icons.videocam), title: Text("Video")),
+      ],
+    ),
+  ),
+);
+
+
+7. 📌 Nested Navigation (BottomNav, Tabs)
+
+You can manage nested navigation with GetNavigator.
+
+Scaffold(
+  body: Navigator(
+    key: Get.nestedKey(1),
+    onGenerateRoute: (settings) {
+      return GetPageRoute(
+        page: () => FirstTabScreen(),
+      );
+    },
+  ),
+  bottomNavigationBar: BottomNavigationBar(
+    items: [
+      BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+      BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
+    ],
+    onTap: (index) {
+      if (index == 0) {
+        Get.to(() => FirstTabScreen(), id: 1);
+      } else {
+        Get.to(() => SettingsScreen(), id: 1);
+      }
+    },
+  ),
+);
+

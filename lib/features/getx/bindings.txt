@@ -1,0 +1,126 @@
+In GetX, Bindings are the mechanism used for dependency injection and controller lifecycle management.
+When you use auto-binding, you don’t have to manually create or find controllers —
+GetX will inject and dispose them automatically when you navigate between pages.
+
+🔹 How Binding Works in GetX:-
+
+1. A Binding class tells GetX which dependencies/controllers should be created for a given route (page).
+
+2. When you navigate to that route, GetX automatically creates those dependencies.
+
+3. When you leave the route (page is removed from memory), GetX disposes the controllers.
+
+==============================================manual===============================
+Example: Manual Binding:-
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+// Controller
+class CounterController extends GetxController {
+  var count = 0.obs;
+
+  void increment() => count++;
+}
+
+// Binding
+class CounterBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.put(CounterController()); // inject controller
+  }
+}
+
+// Page
+class CounterPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<CounterController>();
+
+    return Scaffold(
+      appBar: AppBar(title: Text("Counter Page")),
+      body: Center(
+        child: Obx(() => Text("Count: ${controller.count}")),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: controller.increment,
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+// Main
+void main() {
+  runApp(GetMaterialApp(
+    initialRoute: '/counter',
+    getPages: [
+      GetPage(
+        name: '/counter',
+        page: () => CounterPage(),
+        binding: CounterBinding(), // auto-binding
+      ),
+    ],
+  ));
+}
+
+
+🔑 Explanation
+
+1. CounterBinding registers CounterController automatically when you go to /counter.
+
+2. You don’t call Get.put() manually inside main.dart or inside the widget tree.
+
+3. When you leave /counter, CounterController is disposed if not marked as permanent.
+
+===================auto==============================================================
+🔹 AutoBinding with Get.lazyPut
+
+If you want the controller to be created only when it’s used for the first time, use Get.lazyPut:
+
+class CounterBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut(() => CounterController());
+  }
+}
+
+👉 This improves performance because the controller is not created until needed.
+
+🔹 Multiple Bindings
+
+You can also bind multiple controllers to one page:
+
+class HomeBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.put(UserController());
+    Get.put(ProductController());
+  }
+}
+
+🔹 Global AutoBinding (for all pages)
+
+Instead of assigning binding per route, you can use initialBinding in GetMaterialApp:
+
+void main() {
+  runApp(GetMaterialApp(
+    initialBinding: AppBinding(), // Global binding
+    home: HomePage(),
+  ));
+}
+
+class AppBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.put(AuthController(), permanent: true);
+  }
+}
+👉 Useful for things like AuthController, which should be available everywhere.
+
+✅ In summary:
+
+1. AutoBinding in GetX means your controllers/dependencies are injected automatically when the route loads.
+
+2. You don’t need to manually Get.put() them.
+
+3. Controllers are cleaned up when the page is removed (unless permanent: true).
