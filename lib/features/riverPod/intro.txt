@@ -1,0 +1,256 @@
+1. 📦 What is Riverpod?
+
+Riverpod is a state management library for Flutter & Dart.
+It solves problems of provider:
+
+    1.Doesn’t depend on BuildContext
+
+    2.Compile-time safety
+
+    3.Works in pure Dart (no Flutter needed)
+
+    4.Easier testing
+
+    5.Cleaner state handling
+
+
+
+Step 2: Wrap the app with ProviderScope
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+void main() {
+  runApp(const ProviderScope(child: MyApp()));
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: Text("Riverpod Setup Done ✅")),
+    );
+  }
+}
+
+3. 🧾 Provider Types with Examples
+🔹 a) Provider → Read-only values
+final helloProvider = Provider<String>((ref) => "Hello Riverpod!");
+
+class GreetingScreen extends ConsumerWidget {
+  const GreetingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final message = ref.watch(helloProvider);
+    return Scaffold(
+      body: Center(child: Text(message, style: const TextStyle(fontSize: 24))),
+    );
+  }
+}
+✅ Best for constants, services, or API clients.
+
+
+
+🔹 b) StateProvider → Simple mutable state
+final counterProvider = StateProvider<int>((ref) => 0);
+
+class CounterScreen extends ConsumerWidget {
+  const CounterScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(counterProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Counter")),
+      body: Center(
+        child: Text("Count: $count", style: const TextStyle(fontSize: 32)),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => ref.read(counterProvider.notifier).state++,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+✅ Best for counters, toggles, switches.
+
+🔹 c) FutureProvider → Async (API calls)
+final userProvider = FutureProvider<String>((ref) async {
+  await Future.delayed(const Duration(seconds: 2));
+  return "Amit Kumar (from API)";
+});
+
+class UserScreen extends ConsumerWidget {
+  const UserScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncUser = ref.watch(userProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("User")),
+      body: Center(
+        child: asyncUser.when(
+          data: (user) => Text("User: $user"),
+          loading: () => const CircularProgressIndicator(),
+          error: (err, _) => Text("Error: $err"),
+        ),
+      ),
+    );
+  }
+}
+
+✅ Best for fetching from REST APIs / databases.
+
+🔹 d) StreamProvider → Realtime streams
+final timeProvider = StreamProvider<String>((ref) async* {
+  while (true) {
+    await Future.delayed(const Duration(seconds: 1));
+    yield DateTime.now().toIso8601String();
+  }
+});
+
+class TimeScreen extends ConsumerWidget {
+  const TimeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final time = ref.watch(timeProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Clock")),
+      body: Center(
+        child: time.when(
+          data: (value) => Text(value, style: const TextStyle(fontSize: 20)),
+          loading: () => const CircularProgressIndicator(),
+          error: (e, _) => Text("Error: $e"),
+        ),
+      ),
+    );
+  }
+}
+
+✅ Best for live clocks, sockets, Firestore, WebSockets.
+
+🔹 e) StateNotifierProvider → Complex state
+// MODEL
+class Todo {
+  final String title;
+  final bool isDone;
+  Todo(this.title, {this.isDone = false});
+
+  Todo copyWith({String? title, bool? isDone}) =>
+      Todo(title ?? this.title, isDone: isDone ?? this.isDone);
+}
+
+// STATE NOTIFIER
+class TodoNotifier extends StateNotifier<List<Todo>> {
+  TodoNotifier() : super([]);
+
+  void add(String title) {
+    state = [...state, Todo(title)];
+  }
+
+  void toggle(int index) {
+    state = [
+      for (int i = 0; i < state.length; i++)
+        i == index ? state[i].copyWith(isDone: !state[i].isDone) : state[i]
+    ];
+  }
+}
+
+// PROVIDER
+final todoProvider = StateNotifierProvider<TodoNotifier, List<Todo>>((ref) {
+  return TodoNotifier();
+});
+
+// UI
+class TodoScreen extends ConsumerWidget {
+  const TodoScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final todos = ref.watch(todoProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Todos")),
+      body: ListView.builder(
+        itemCount: todos.length,
+        itemBuilder: (_, i) {
+          final todo = todos[i];
+          return ListTile(
+            title: Text(todo.title,
+                style: TextStyle(
+                    decoration: todo.isDone
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none)),
+            trailing: Checkbox(
+              value: todo.isDone,
+              onChanged: (_) => ref.read(todoProvider.notifier).toggle(i),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () =>
+            ref.read(todoProvider.notifier).add("Task ${todos.length + 1}"),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+✅ Best for business logic, multiple states, forms, lists.
+
+
+4. 🔄 Provider Lifecycles
+
+    1. ref.watch(provider) → rebuilds widget when state changes
+
+    2. ref.read(provider) → reads once, no rebuild
+
+    3. ref.listen(provider, (prev, next) {...}) → reacts to changes
+
+Example:
+
+ref.listen<int>(counterProvider, (prev, next) {
+  if (next == 5) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text("Reached 5!")));
+  }
+});
+
+
+
+5. ✅ Best Practices
+
+    1. Use Provider → services, constants, configs
+
+    2. Use StateProvider → simple counters, toggles
+
+    3. Use FutureProvider → API calls, DB fetches
+
+    4. Use StreamProvider → sockets, Firestore, live updates
+
+    5. Use StateNotifierProvider → complex states/business logic
+
+    6. Put business logic in Notifiers, not widgets
+
+    7. Keep providers in a separate file (scalable projects)
+
+============================ demo app ===================================================

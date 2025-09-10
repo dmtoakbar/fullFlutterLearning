@@ -1,0 +1,213 @@
+🔹 Core Riverpod Providers (Quick Recap)
+
+    1. Provider → Read-only values (e.g., config, constants).
+
+    2. StateProvider → Simple mutable state (like setState).
+
+    3. FutureProvider → Asynchronous state (API calls).
+
+    4. StreamProvider → Stream values (Firebase, sockets).
+
+    5. NotifierProvider / AsyncNotifierProvider → Advanced logic with immutable state classes.
+
+
+🔹 Advanced Concepts
+1. Dependency Injection with Riverpod
+
+Providers can depend on other providers.
+
+    final configProvider = Provider<String>((ref) => "https://api.example.com");
+
+    final apiServiceProvider = Provider<ApiService>((ref) {
+      final baseUrl = ref.watch(configProvider);
+      return ApiService(baseUrl);
+    });
+
+
+2. Notifier (Immutable State Management)
+class CounterNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void increment() => state++;
+  void decrement() => state--;
+}
+
+final counterNotifierProvider = NotifierProvider<CounterNotifier, int>(() {
+  return CounterNotifier();
+});
+
+3. AsyncNotifier (Async State Management)
+
+class UserNotifier extends AsyncNotifier<User?> {
+  @override
+  Future<User?> build() async {
+    return null; // initial state
+  }
+
+  Future<void> fetchUser(int id) async {
+    state = const AsyncLoading();
+    try {
+      final user = await ApiService("https://jsonplaceholder.typicode.com")
+          .fetchUser(id);
+      state = AsyncData(user);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+}
+
+final userNotifierProvider = AsyncNotifierProvider<UserNotifier, User?>(() {
+  return UserNotifier();
+});
+
+
+🔹 Full Working Example (Advanced)
+
+👉 Save this as lib/main.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+// ------------------- MODELS -------------------
+class User {
+  final int id;
+  final String name;
+  final String email;
+
+  User({required this.id, required this.name, required this.email});
+
+  factory User.fromJson(Map<String, dynamic> json) =>
+      User(id: json['id'], name: json['name'], email: json['email']);
+}
+
+// ------------------- SERVICES -------------------
+class ApiService {
+  final String baseUrl;
+  ApiService(this.baseUrl);
+
+  Future<User> fetchUser(int id) async {
+    final response = await http.get(Uri.parse("$baseUrl/users/$id"));
+    if (response.statusCode == 200) {
+      return User.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception("Failed to load user");
+    }
+  }
+}
+
+// ------------------- PROVIDERS -------------------
+final configProvider = Provider<String>((ref) => "https://jsonplaceholder.typicode.com");
+
+final apiServiceProvider = Provider<ApiService>((ref) {
+  final baseUrl = ref.watch(configProvider);
+  return ApiService(baseUrl);
+});
+
+// Counter with Notifier
+class CounterNotifier extends Notifier<int> {
+  @override
+  int build() => 0;
+  void increment() => state++;
+  void decrement() => state--;
+}
+
+final counterProvider = NotifierProvider<CounterNotifier, int>(() => CounterNotifier());
+
+// Async User Fetcher
+class UserNotifier extends AsyncNotifier<User?> {
+  @override
+  Future<User?> build() async => null;
+
+  Future<void> fetchUser(int id) async {
+    state = const AsyncLoading();
+    try {
+      final user = await ref.read(apiServiceProvider).fetchUser(id);
+      state = AsyncData(user);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+}
+
+final userProvider = AsyncNotifierProvider<UserNotifier, User?>(() => UserNotifier());
+
+// ------------------- UI -------------------
+void main() {
+  runApp(const ProviderScope(child: MyApp()));
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Riverpod Advanced Demo',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final counter = ref.watch(counterProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Riverpod Advanced Example")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // ---------------- COUNTER ----------------
+            Text("Counter: $counter", style: const TextStyle(fontSize: 24)),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(onPressed: () => ref.read(counterProvider.notifier).increment(), child: const Text("Increment")),
+                const SizedBox(width: 10),
+                ElevatedButton(onPressed: () => ref.read(counterProvider.notifier).decrement(), child: const Text("Decrement")),
+              ],
+            ),
+
+            const Divider(height: 40),
+
+            // ---------------- USER FETCH ----------------
+            const Text("Fetch User from API:", style: TextStyle(fontSize: 20)),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => ref.read(userProvider.notifier).fetchUser(1),
+              child: const Text("Load User #1"),
+            ),
+            const SizedBox(height: 20),
+            ref.watch(userProvider).when(
+              data: (user) => user == null
+                  ? const Text("No user loaded yet")
+                  : Text("Name: ${user.name}\nEmail: ${user.email}", textAlign: TextAlign.center),
+              loading: () => const CircularProgressIndicator(),
+              error: (err, _) => Text("Error: $err"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+=====================file structure==========================
+lib/
+ ├─ models/
+ ├─ services/
+ ├─ providers/
+ ├─ screens/
+ └─ main.dart
+
