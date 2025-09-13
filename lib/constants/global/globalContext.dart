@@ -62,3 +62,19 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
+
+// more example
+  GlobalVariable.navigatorKey.currentState?.pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(userId: 'first', roomId: username),
+      ),
+    );
+
+
+    GlobalVariable.navigatorKey.currentState?.pop(); // Go back if fails
+
+    NavigationService.pushReplacement(
+      ChatScreen(userId: 'first', roomId: username),
+    );
