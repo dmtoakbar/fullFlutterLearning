@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:learn_getx_bloc_riverpod/chatApp/variable/globalVariable.dart';
 
 class LoginAndRegister {
   static String baseUrl = dotenv.env['API_URL'] ?? "";
@@ -18,6 +19,7 @@ class LoginAndRegister {
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         final decoded = jsonDecode(res.body);
+        GlobalVariable.authenticationToken = decoded['token'];
         return {"status": "success", "data": decoded};
       } else {
         return {
@@ -44,6 +46,7 @@ class LoginAndRegister {
 
       if (res.statusCode == 200) {
         final decoded = jsonDecode(res.body);
+        GlobalVariable.authenticationToken = decoded['token'];
         return {"status": "success", "data": decoded};
       } else {
         return {

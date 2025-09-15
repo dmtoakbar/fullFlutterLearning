@@ -1,3 +1,4 @@
+import 'package:learn_getx_bloc_riverpod/chatApp/variable/globalVariable.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -9,9 +10,9 @@ class SocketService {
       dotenv.env['SOCKET_URL']!,
       IO.OptionBuilder()
           .setTransports(['websocket'])
-          .setExtraHeaders({'Authorization': 'Bearer '})
+          .setExtraHeaders({'Authorization': 'Bearer ${GlobalVariable.authenticationToken}'})
           .disableAutoConnect()
-          .setAuth({'token': 'yplr'})
+          .setAuth({'token': GlobalVariable.authenticationToken})
           .build(),
     );
 

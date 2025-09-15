@@ -27,19 +27,19 @@ class _ChatScreenState extends State<ChatScreen> {
     socketService.connect(widget.userId);
     socketService.joinRoom(widget.roomId);
 
-    socketService.onMessage((data) {
-      setState(() => messages.add(data));
-      socketService.messageSeen(data['id']); // mark as seen
-    });
-
-    socketService.onTyping((data) {
-      print("${data['from']} is typing: ${data['isTyping']}");
-      setState(() => isTyping = data['isTyping']);
-    });
-
-    socketService.onSeen((data) {
-      print("Message seen: ${data['message']['id']}");
-    });
+    // socketService.onMessage((data) {
+    //   setState(() => messages.add(data));
+    //   socketService.messageSeen(data['id']); // mark as seen
+    // });
+    //
+    // socketService.onTyping((data) {
+    //   print("${data['from']} is typing: ${data['isTyping']}");
+    //   setState(() => isTyping = data['isTyping']);
+    // });
+    //
+    // socketService.onSeen((data) {
+    //   print("Message seen: ${data['message']['id']}");
+    // });
   }
 
   void sendMessage() {
@@ -50,6 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
       "from": widget.userId,
       "roomId": widget.roomId,
       "text": text,
+      "to": "first1"
     });
     controller.clear();
   }

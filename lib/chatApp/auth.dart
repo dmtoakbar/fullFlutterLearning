@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:learn_getx_bloc_riverpod/chatApp/LoginAndRegister.dart';
+import 'package:learn_getx_bloc_riverpod/chatApp/variable/globalVariable.dart';
 
 class RegisterAndLoginAuth extends StatelessWidget {
   const RegisterAndLoginAuth({super.key});
@@ -15,13 +16,22 @@ class RegisterAndLoginAuth extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () async {
-                 final result = await LoginAndRegister.register(username: 'amitkumarverf', password: '948304lfldk');
-                 debugPrint('======================result $result');
+                  final result = await LoginAndRegister.register(
+                    username: 'amitkumfagfsrverf',
+                    password: '948304lfldk',
+                  );
+                  debugPrint('======================result $result');
+                  debugPrint(
+                    '==========token==================== ${GlobalVariable.authenticationToken}',
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue, // button color
                   foregroundColor: Colors.white, // text color
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12), // rounded corners
                   ),
@@ -32,13 +42,16 @@ class RegisterAndLoginAuth extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
-              SizedBox(height: 10,),
+              SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black, // button color
                   foregroundColor: Colors.white, // text color
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12), // rounded corners
                   ),
@@ -48,7 +61,7 @@ class RegisterAndLoginAuth extends StatelessWidget {
                   'Login',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              )
+              ),
             ],
           ),
         ),

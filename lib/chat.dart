@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:learn_getx_bloc_riverpod/chatApp/auth.dart';
+import 'package:learn_getx_bloc_riverpod/chatApp/initiaChat.dart';
+import 'package:learn_getx_bloc_riverpod/chatApp/variable/globalVariable.dart';
 import 'chatApp/screens/chat_screen.dart';
 
 Future<void> main() async {
@@ -14,8 +16,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Flutter Chat",
+      navigatorKey: GlobalVariable.navigatorKey,
       // home: ChatScreen(userId: "user1", roomId: "room1"),
-      home: RegisterAndLoginAuth(),
+      home: Initializes(),
     );
   }
 }
