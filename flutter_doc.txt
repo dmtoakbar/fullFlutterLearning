@@ -1,0 +1,2578 @@
+	#####################Chapter 1 #######################################
+
+			###### Foundation Widgets######
+	- Widget
+	- Key, ValueKey, ObjectKey
+	- InheritedWidget
+	- MediaQuery
+	- LayoutBuilder
+	- Focus, FocusScope
+	- NotificationListener
+	- Overlay, OverlayEntry
+	- GlobalKey
+         
+	
+	1️⃣ Widget (Base Class)
+
+	Description:
+	All Flutter UI components are Widgets. They can be Stateless (immutable) or Stateful (mutable).
+
+	Example:
+
+	import 'package:flutter/material.dart';
+
+	void main() => runApp(const MyApp());
+
+	// StatelessWidget
+	class MyApp extends StatelessWidget {
+	  const MyApp({super.key});
+
+	  @override
+	  Widget build(BuildContext context) {
+	    return const MaterialApp(
+	      home: Scaffold(
+		body: Center(child: Text('Hello Flutter Widget')),
+	      ),
+	    );
+	  }
+	}
+
+	// StatefulWidget
+	class CounterWidget extends StatefulWidget {
+	  const CounterWidget({super.key});
+
+	  @override
+	  State<CounterWidget> createState() => _CounterWidgetState();
+	}
+
+	class _CounterWidgetState extends State<CounterWidget> {
+	  int _count = 0;
+
+	  @override
+	  Widget build(BuildContext context) {
+	    return Column(
+	      mainAxisAlignment: MainAxisAlignment.center,
+	      children: [
+		Text('Count: $_count'),
+		ElevatedButton(
+		  onPressed: () => setState(() => _count++),
+		  child: const Text('Increment'),
+		),
+	      ],
+	    );
+	  }
+	}
+
+
+	2️⃣ Key, ValueKey, ObjectKey
+
+	Description:
+	Keys help Flutter identify widgets when rebuilding the widget tree. Useful in ListView or dynamic children.
+
+	ValueKey: uses a value (e.g., String, int) to identify a widget.
+
+	ObjectKey: uses an object reference.
+
+	Example:
+
+	ListView(
+	  children: [
+	    Text('Item A', key: ValueKey('A')),
+	    Text('Item B', key: ValueKey('B')),
+	  ],
+	);
+
+
+	3️⃣ InheritedWidget
+
+	Description:
+	Allows sharing immutable data down the widget tree efficiently. Widgets can access it using of(context).
+
+	Example:
+
+
+	class CounterData extends InheritedWidget {
+	  final int count;
+
+	  const CounterData({
+	    required this.count,
+	    required super.child,
+	    super.key,
+	  });
+
+	  static CounterData? of(BuildContext context) =>
+	      context.dependOnInheritedWidgetOfExactType<CounterData>();
+
+	  @override
+	  bool updateShouldNotify(CounterData oldWidget) => count != oldWidget.count;
+	}
+
+	// Usage:
+	CounterData(
+	  count: 10,
+	  child: Text('Count is ${CounterData.of(context)?.count}'),
+	);
+
+
+	4️⃣ MediaQuery
+
+	Description:
+	Provides information about screen size, orientation, padding, text scaling.
+
+	Example:
+
+	final size = MediaQuery.of(context).size;
+	Text('Width: ${size.width}, Height: ${size.height}');
+
+
+	5️⃣ LayoutBuilder
+
+	Description:
+	Builds widgets based on parent constraints. Useful for responsive layouts.
+
+	Example:
+
+	LayoutBuilder(
+	  builder: (context, constraints) {
+	    if (constraints.maxWidth > 600) {
+	      return const Text('Wide screen');
+	    } else {
+	      return const Text('Narrow screen');
+	    }
+	  },
+	);
+
+	6️⃣ Focus & FocusScope
+
+	Description:
+	Manages keyboard focus for text fields or interactive widgets.
+
+	Example:
+
+	FocusScope(
+	  child: Column(
+	    children: [
+	      TextField(),
+	      TextField(),
+	    ],
+	  ),
+	);
+
+
+	You can use FocusNode to programmatically request focus:
+
+	FocusNode myFocus = FocusNode();
+	myFocus.requestFocus();
+
+
+	7️⃣ NotificationListener
+
+	Description:
+	Listens for notifications from descendant widgets, e.g., scroll events.
+
+	Example:
+
+	NotificationListener<ScrollNotification>(
+	  onNotification: (scrollNotification) {
+	    print('Scroll position: ${scrollNotification.metrics.pixels}');
+	    return true;
+	  },
+	  child: ListView.builder(
+	    itemCount: 10,
+	    itemBuilder: (context, index) => ListTile(title: Text('Item $index')),
+	  ),
+	);
+
+	8️⃣ Overlay & OverlayEntry
+
+	Description:
+	Overlay allows floating widgets above other widgets, like modals, dropdowns, tooltips.
+
+	Example:
+
+	OverlayEntry overlayEntry = OverlayEntry(
+	  builder: (context) => Positioned(
+	    top: 100,
+	    left: 50,
+	    child: Material(
+	      color: Colors.transparent,
+	      child: Text('Floating Overlay', style: TextStyle(fontSize: 24, color: Colors.red)),
+	    ),
+	  ),
+	);
+
+	// Insert overlay
+	Overlay.of(context)?.insert(overlayEntry);
+
+	9️⃣ GlobalKey
+
+	Description:
+	A key that is unique across the entire app. Lets you access widget state or context from anywhere.
+
+	Example:
+
+	final GlobalKey<_MyWidgetState> myKey = GlobalKey<_MyWidgetState>();
+
+	class MyWidget extends StatefulWidget {
+	  const MyWidget({super.key});
+	  @override
+	  State<MyWidget> createState() => _MyWidgetState();
+	}
+
+	class _MyWidgetState extends State<MyWidget> {
+	  String message = 'Hello';
+	  void changeMessage(String msg) => setState(() => message = msg);
+
+	  @override
+	  Widget build(BuildContext context) => Text(message);
+	}
+
+	// Access state anywhere
+	myKey.currentState?.changeMessage('Hi!');
+
+
+	#########################Chapter 2###################################
+
+		#######Material Widgets#############
+
+	- Scaffold, AppBar, BottomNavigationBar, Drawer, Card, ListTile, Divider
+	- FloatingActionButton, Chip, Snackbar, PopupMenuButton
+	- Stepper, ExpansionPanelList, ExpansionTile, Divider
+	- TabBar, TabBarView, MaterialBanner
+	- DataTable, PaginatedDataTable, Tooltip, InkWell, InkResponse, ProgressIndicator
+	- Slider, RangeSlider, Switch, Checkbox, Radio, ToggleButtons, ButtonBar
+	- BottomSheet, DrawerHeader, ListView, GridView, PageView
+	- TextField, TextFormField, Form, Autocomplete, DropdownButton, DropdownMenuItem
+	- Stepper, Card, ListTile, Divider, Chip
+	- Theme, ThemeData, Typography, IconTheme, TextTheme, ButtonTheme: explain this with example
+
+	## Scaffold
+	**Description:** The main structure for a Material app, providing an AppBar, body, Drawer, BottomNavigationBar, and FloatingActionButton.
+	```dart
+	Scaffold(
+	  appBar: AppBar(title: const Text('Scaffold Example')),
+	  body: const Center(child: Text('Hello Material!')),
+	  drawer: const Drawer(child: Center(child: Text('Drawer'))),
+	  bottomNavigationBar: BottomNavigationBar(
+	    items: const [
+	      BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+	      BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+	    ],
+	  ),
+	  floatingActionButton: FloatingActionButton(
+	    onPressed: () {},
+	    child: const Icon(Icons.add),
+	  ),
+	);
+	```
+
+	## AppBar
+	**Description:** The top bar of a Material app. Can hold a title, navigation icons, and actions.
+	```dart
+	AppBar(
+	  title: const Text('AppBar Example'),
+	  actions: [IconButton(icon: const Icon(Icons.search), onPressed: () {})],
+	);
+	```
+
+	## BottomNavigationBar
+	**Description:** Provides navigation tabs at the bottom. Each tab has an icon and label.
+	```dart
+	BottomNavigationBar(
+	  items: const [
+	    BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+	    BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+	  ],
+	  currentIndex: 0,
+	  onTap: (index) {},
+	);
+	```
+
+	## Drawer
+	**Description:** A sliding menu panel from the left for app navigation.
+	```dart
+	Drawer(
+	  child: ListView(
+	    children: const [
+	      DrawerHeader(child: Text('Header')),
+	      ListTile(title: Text('Item 1')),
+	      ListTile(title: Text('Item 2')),
+	    ],
+	  ),
+	);
+	```
+
+	## Card
+	**Description:** A Material card with elevation and rounded corners to hold related content.
+	```dart
+	Card(
+	  elevation: 4,
+	  child: Padding(
+	    padding: const EdgeInsets.all(16.0),
+	    child: Column(
+	      children: const [
+		Text('Card Title', style: TextStyle(fontSize: 20)),
+		Text('Card content goes here'),
+	      ],
+	    ),
+	  ),
+	);
+	```
+
+	## ListTile
+	**Description:** A single row containing title, subtitle, leading/trailing widgets, and tap functionality.
+	```dart
+	ListTile(
+	  leading: const Icon(Icons.person),
+	  title: const Text('John Doe'),
+	  subtitle: const Text('Subtitle'),
+	  trailing: const Icon(Icons.arrow_forward),
+	  onTap: () {},
+	);
+	```
+
+	## Divider
+	**Description:** A horizontal line to separate content.
+	```dart
+	Column(
+	  children: const [
+	    Text('Above Divider'),
+	    Divider(color: Colors.black),
+	    Text('Below Divider'),
+	  ],
+	);
+	```
+
+	## FloatingActionButton
+	**Description:** Circular button that floats above content for primary actions.
+	```dart
+	FloatingActionButton(
+	  onPressed: () {},
+	  child: const Icon(Icons.add),
+	);
+	```
+
+	## Chip
+	**Description:** Small compact element to display information, tags, or actions.
+	```dart
+	Chip(
+	  label: const Text('Flutter'),
+	  avatar: const Icon(Icons.tag),
+	  backgroundColor: Colors.blue.shade100,
+	);
+	```
+
+	## SnackBar
+	**Description:** Temporary message at the bottom of the screen.
+	```dart
+	ScaffoldMessenger.of(context).showSnackBar(
+	  const SnackBar(content: Text('Hello SnackBar!')),
+	);
+	```
+
+	## PopupMenuButton
+	**Description:** Button that shows a menu with multiple options.
+	```dart
+	PopupMenuButton(
+	  itemBuilder: (context) => [
+	    const PopupMenuItem(child: Text('Option 1')),
+	    const PopupMenuItem(child: Text('Option 2')),
+	  ],
+	);
+	```
+
+	## Stepper
+	**Description:** Displays steps for a process workflow.
+	```dart
+	Stepper(
+	  steps: const [
+	    Step(title: Text('Step 1'), content: Text('Content 1')),
+	    Step(title: Text('Step 2'), content: Text('Content 2')),
+	  ],
+	  currentStep: 0,
+	  onStepTapped: (step) {},
+	);
+	```
+
+	## ExpansionTile
+	**Description:** Collapsible panel to hide or show content.
+	```dart
+	ExpansionTile(
+	  title: const Text('Click to Expand'),
+	  children: const [
+	    ListTile(title: Text('Item 1')),
+	    ListTile(title: Text('Item 2')),
+	  ],
+	);
+	```
+
+	## TabBar / TabBarView
+	**Description:** Tabs with swipeable content.
+	```dart
+	DefaultTabController(
+	  length: 2,
+	  child: Scaffold(
+	    appBar: AppBar(
+	      bottom: const TabBar(tabs: [Tab(text: 'Tab 1'), Tab(text: 'Tab 2')]),
+	    ),
+	    body: const TabBarView(children: [
+	      Center(child: Text('Content 1')),
+	      Center(child: Text('Content 2')),
+	    ]),
+	  ),
+	);
+	```
+
+	## MaterialBanner
+	**Description:** Persistent banner at the top of the screen.
+	```dart
+	ScaffoldMessenger.of(context).showMaterialBanner(
+	  MaterialBanner(
+	    content: const Text('Important Banner'),
+	    actions: [TextButton(onPressed: () {}, child: const Text('DISMISS'))],
+	  ),
+	);
+	```
+
+	## DataTable
+	**Description:** Displays tabular data.
+	```dart
+	DataTable(
+	  columns: const [
+	    DataColumn(label: Text('Name')),
+	    DataColumn(label: Text('Age')),
+	  ],
+	  rows: const [
+	    DataRow(cells: [DataCell(Text('Alice')), DataCell(Text('25'))]),
+	    DataRow(cells: [DataCell(Text('Bob')), DataCell(Text('30'))]),
+	  ],
+	);
+	```
+
+	## Tooltip
+	**Description:** Shows a hint when long-pressed or hovered.
+	```dart
+	Tooltip(
+	  message: 'Info Icon',
+	  child: Icon(Icons.info),
+	);
+	```
+
+	## InkWell / InkResponse
+	**Description:** Adds ripple effect on tap.
+	```dart
+	InkWell(
+	  onTap: () => print('Tapped!'),
+	  child: const Padding(
+	    padding: EdgeInsets.all(8),
+	    child: Text('Tap Me'),
+	  ),
+	);
+	```
+
+	## ProgressIndicator
+	**Description:** Shows circular or linear loading progress.
+	```dart
+	CircularProgressIndicator();
+	LinearProgressIndicator(value: 0.5);
+	```
+
+	## Slider / RangeSlider / Switch / Checkbox / Radio / ToggleButtons / ButtonBar
+	**Description:** Input controls for selections.
+	```dart
+	Slider(value: 0.5, onChanged: (v) {});
+	RangeSlider(values: const RangeValues(0.2, 0.8), onChanged: (v) {});
+	Switch(value: true, onChanged: (v) {});
+	Checkbox(value: false, onChanged: (v) {});
+	Radio<int>(value: 1, groupValue: 1, onChanged: (v) {});
+	ToggleButtons(
+	  children: const [Icon(Icons.home), Icon(Icons.search)],
+	  isSelected: [true, false],
+	  onPressed: (i) {},
+	);
+	ButtonBar(children: [ElevatedButton(onPressed: () {}, child: const Text('OK'))]);
+	```
+
+	## BottomSheet / DrawerHeader / ListView / GridView / PageView
+	**Description:** Scrollable views, panels, and headers.
+	```dart
+	showModalBottomSheet(
+	  context: context,
+	  builder: (context) => const Padding(
+	    padding: EdgeInsets.all(16),
+	    child: Text('Bottom Sheet Content'),
+	  ),
+	);
+
+	DrawerHeader(child: Text('Header'));
+
+	ListView(
+	  children: const [ListTile(title: Text('Item 1')), ListTile(title: Text('Item 2'))],
+	);
+
+	GridView.count(
+	  crossAxisCount: 2,
+	  children: List.generate(4, (i) => Card(child: Center(child: Text('Card $i')))),
+	);
+
+	PageView(
+	  children: const [Center(child: Text('Page 1')), Center(child: Text('Page 2'))],
+	);
+	```
+
+	## TextField / TextFormField / Form / Autocomplete / DropdownButton / DropdownMenuItem
+	**Description:** Input fields, forms, and dropdown selection.
+	```dart
+	Form(
+	  child: Column(
+	    children: [
+	      TextFormField(decoration: const InputDecoration(labelText: 'Name')),
+	      DropdownButton<String>(
+		value: 'One',
+		items: ['One', 'Two'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+		onChanged: (v) {},
+	      ),
+	      Autocomplete<String>(
+		optionsBuilder: (textEditingValue) => ['Apple', 'Banana', 'Cherry']
+		    .where((option) => option.toLowerCase().contains(textEditingValue.text.toLowerCase())),
+	      ),
+	    ],
+	  ),
+	);
+	```
+
+	## Theme / ThemeData / Typography / IconTheme / TextTheme / ButtonTheme
+	**Description:** Global theming for colors, typography, icons, and buttons.
+	```dart
+	MaterialApp(
+	  theme: ThemeData(
+	    primarySwatch: Colors.teal,
+	    textTheme: const TextTheme(bodyMedium: TextStyle(fontSize: 18)),
+	    iconTheme: const IconThemeData(color: Colors.red, size: 30),
+	    buttonTheme: const ButtonThemeData(buttonColor: Colors.blue),
+	  ),
+	  home: Scaffold(
+	  )
+
+
+	###################Chapter 3###################################################
+	
+ 			#########Cupertino Widgets##########
+
+	- CupertinoApp, CupertinoButton, CupertinoNavigationBar, CupertinoTabBar, CupertinoSwitch, CupertinoSlider,
+	CupertinoSegmentedControl
+	- CupertinoTextField, CupertinoPageScaffold, CupertinoAlertDialog, CupertinoActionSheet
+	- CupertinoTimerPicker, CupertinoPicker, CupertinoScrollbar
+
+
+		
+	## CupertinoApp
+	**Description:** iOS-style app container. Similar to MaterialApp but follows Cupertino design.
+	```dart
+	CupertinoApp(
+	  home: const CupertinoPageScaffold(
+	    navigationBar: CupertinoNavigationBar(middle: Text('Cupertino App')),
+	    child: Center(child: Text('Hello Cupertino')),
+	  ),
+	);
+	```
+
+	## CupertinoButton
+	**Description:** iOS-style button.
+	```dart
+	CupertinoButton(
+	  onPressed: () {},
+	  color: CupertinoColors.activeBlue,
+	  child: const Text('Press Me'),
+	);
+	```
+
+	## CupertinoNavigationBar
+	**Description:** iOS-style navigation bar with title and optional buttons.
+	```dart
+	CupertinoNavigationBar(
+	  middle: const Text('Navigation'),
+	  leading: CupertinoButton(
+	    padding: EdgeInsets.zero,
+	    child: const Icon(CupertinoIcons.back),
+	    onPressed: () {},
+	  ),
+	);
+	```
+
+	## CupertinoTabBar
+	**Description:** Bottom tab bar for iOS apps.
+	```dart
+	CupertinoTabScaffold(
+	  tabBar: CupertinoTabBar(
+	    items: const [
+	      BottomNavigationBarItem(icon: Icon(CupertinoIcons.home), label: 'Home'),
+	      BottomNavigationBarItem(icon: Icon(CupertinoIcons.settings), label: 'Settings'),
+	    ],
+	  ),
+	  tabBuilder: (context, index) {
+	    return Center(child: Text('Tab \$index'));
+	  },
+	);
+	```
+
+	## CupertinoSwitch
+	**Description:** iOS-style switch for on/off values.
+	```dart
+	CupertinoSwitch(
+	  value: true,
+	  onChanged: (bool value) {},
+	);
+	```
+
+	## CupertinoSlider
+	**Description:** iOS-style slider to select numeric value.
+	```dart
+	CupertinoSlider(
+	  value: 0.5,
+	  onChanged: (double value) {},
+	);
+	```
+
+	## CupertinoSegmentedControl
+	**Description:** iOS-style segmented control for multiple options.
+	```dart
+	CupertinoSegmentedControl<int>(
+	  children: const {
+	    0: Text('One'),
+	    1: Text('Two'),
+	    2: Text('Three'),
+	  },
+	  groupValue: 0,
+	  onValueChanged: (int value) {},
+	);
+	```
+
+	## CupertinoTextField
+	**Description:** iOS-style text input field.
+	```dart
+	CupertinoTextField(
+	  placeholder: 'Enter text',
+	);
+	```
+
+	## CupertinoPageScaffold
+	**Description:** Page layout for iOS, includes navigationBar and child content.
+	```dart
+	CupertinoPageScaffold(
+	  navigationBar: const CupertinoNavigationBar(middle: Text('Page Scaffold')),
+	  child: Center(child: Text('Page content')),
+	);
+	```
+
+	## CupertinoAlertDialog
+	**Description:** iOS-style alert dialog with title, content, and actions.
+	```dart
+	showCupertinoDialog(
+	  context: context,
+	  builder: (context) => CupertinoAlertDialog(
+	    title: const Text('Alert'),
+	    content: const Text('This is an iOS alert'),
+	    actions: [
+	      CupertinoDialogAction(child: const Text('OK'), onPressed: () => Navigator.pop(context)),
+	    ],
+	  ),
+	);
+	```
+
+	## CupertinoActionSheet
+	**Description:** iOS-style bottom sheet with actions.
+	```dart
+	showCupertinoModalPopup(
+	  context: context,
+	  builder: (context) => CupertinoActionSheet(
+	    title: const Text('Actions'),
+	    message: const Text('Choose one'),
+	    actions: [
+	      CupertinoActionSheetAction(child: const Text('Option 1'), onPressed: () => Navigator.pop(context)),
+	      CupertinoActionSheetAction(child: const Text('Option 2'), onPressed: () => Navigator.pop(context)),
+	    ],
+	    cancelButton: CupertinoActionSheetAction(child: const Text('Cancel'), onPressed: () => Navigator.pop(context)),
+	  ),
+	);
+	```
+
+	## CupertinoTimerPicker
+	**Description:** iOS-style time picker for duration selection.
+	```dart
+	CupertinoTimerPicker(
+	  mode: CupertinoTimerPickerMode.hms,
+	  initialTimerDuration: const Duration(minutes: 1),
+	  onTimerDurationChanged: (Duration value) {},
+	);
+	```
+
+	## CupertinoPicker
+	**Description:** iOS-style scrolling picker.
+	```dart
+	CupertinoPicker(
+	  itemExtent: 32.0,
+	  onSelectedItemChanged: (int index) {},
+	  children: const [Text('One'), Text('Two'), Text('Three')],
+	);
+	```
+
+	## CupertinoScrollbar
+	**Description:** iOS-style scrollbar.
+	```dart
+	CupertinoScrollbar(
+	  child: ListView.builder(
+	    itemCount: 20,
+	    itemBuilder: (context, index) => ListTile(title: Text('Item \$index')),
+	  ),
+	);
+	```
+
+
+	###################################Chapter 4#################################
+
+			#######Layout Widgets#######
+
+	- Container, Padding, Align, Center, SizedBox, ConstrainedBox, AspectRatio, FractionallySizedBox
+	- Row, Column, Stack, Positioned, IndexedStack, Offstage, Visibility, Expanded, Flexible, Spacer
+	- ListView, GridView, SingleChildScrollView, CustomScrollView, Scrollbar, ReorderableListView
+	- Wrap, Flow, Table, TableRow, TableCell, FittedBox, Baseline
+
+
+	## Container
+	**Description:** A box model with padding, margin, decoration, and size.
+	```dart
+	Container(
+	  width: 100,
+	  height: 100,
+	  color: Colors.blue,
+	  child: const Center(child: Text('Container')),
+	);
+	```
+
+	## Padding
+	**Description:** Adds spacing around child widget.
+	```dart
+	Padding(
+	  padding: const EdgeInsets.all(16.0),
+	  child: const Text('Padded Text'),
+	);
+	```
+
+	## Align
+	**Description:** Aligns a child within itself.
+	```dart
+	Align(
+	  alignment: Alignment.topRight,
+	  child: const Text('Top Right'),
+	);
+	```
+
+	## Center
+	**Description:** Centers child widget.
+	```dart
+	Center(
+	  child: const Text('Centered Text'),
+	);
+	```
+
+	## SizedBox
+	**Description:** Sets fixed width and height.
+	```dart
+	SizedBox(
+	  width: 100,
+	  height: 50,
+	  child: ElevatedButton(onPressed: () {}, child: const Text('Button')),
+	);
+	```
+
+	## ConstrainedBox
+	**Description:** Applies size constraints to a child.
+	```dart
+	ConstrainedBox(
+	  constraints: const BoxConstraints(minWidth: 100, maxWidth: 200),
+	  child: Container(color: Colors.red, height: 50),
+	);
+	```
+
+	## AspectRatio
+	**Description:** Forces child to a specific aspect ratio.
+	```dart
+	AspectRatio(
+	  aspectRatio: 16/9,
+	  child: Container(color: Colors.green),
+	);
+	```
+
+	## FractionallySizedBox
+	**Description:** Sizes child as fraction of parent.
+	```dart
+	FractionallySizedBox(
+	  widthFactor: 0.5,
+	  heightFactor: 0.3,
+	  child: Container(color: Colors.orange),
+	);
+	```
+
+	## Row
+	**Description:** Horizontal layout of children.
+	```dart
+	Row(
+	  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+	  children: const [Text('1'), Text('2'), Text('3')],
+	);
+	```
+
+	## Column
+	**Description:** Vertical layout of children.
+	```dart
+	Column(
+	  mainAxisAlignment: MainAxisAlignment.center,
+	  children: const [Text('A'), Text('B'), Text('C')],
+	);
+	```
+
+	## Stack
+	**Description:** Overlays children on top of each other.
+	```dart
+	Stack(
+	  children: [
+	    Container(width: 100, height: 100, color: Colors.blue),
+	    Positioned(top: 20, left: 20, child: Container(width: 50, height: 50, color: Colors.red)),
+	  ],
+	);
+	```
+
+	## Positioned
+	**Description:** Positions a child inside a Stack.
+	```dart
+	Positioned(
+	  top: 10,
+	  left: 10,
+	  child: Container(color: Colors.yellow, width: 50, height: 50),
+	);
+	```
+
+	## IndexedStack
+	**Description:** Displays only one child at a time, maintains others in memory.
+	```dart
+	IndexedStack(
+	  index: 1,
+	  children: const [Text('First'), Text('Second'), Text('Third')],
+	);
+	```
+
+	## Offstage
+	**Description:** Hides a child from view but keeps it in the tree.
+	```dart
+	Offstage(
+	  offstage: true,
+	  child: const Text('Hidden'),
+	);
+	```
+
+	## Visibility
+	**Description:** Controls visibility of a child with optional replacement.
+	```dart
+	Visibility(
+	  visible: false,
+	  child: const Text('Invisible'),
+	  replacement: const Text('Replacement'),
+	);
+	```
+
+	## Expanded
+	**Description:** Fills available space in Row/Column.
+	```dart
+	Row(
+	  children: [
+	    Expanded(child: Container(color: Colors.red, height: 50)),
+	    Expanded(child: Container(color: Colors.blue, height: 50)),
+	  ],
+	);
+	```
+
+	## Flexible
+	**Description:** Similar to Expanded but allows flexibility in space allocation.
+	```dart
+	Flexible(
+	  flex: 2,
+	  child: Container(color: Colors.green, height: 50),
+	);
+	```
+
+	## Spacer
+	**Description:** Adds empty space in Row/Column.
+	```dart
+	Row(
+	  children: const [Text('Start'), Spacer(), Text('End')],
+	);
+	```
+
+	## ListView
+	**Description:** Scrollable vertical list.
+	```dart
+	ListView.builder(
+	  itemCount: 5,
+	  itemBuilder: (context, index) => ListTile(title: Text('Item \$index')),
+	);
+	```
+
+	## GridView
+	**Description:** Scrollable grid layout.
+	```dart
+	GridView.count(
+	  crossAxisCount: 2,
+	  children: List.generate(4, (index) => Card(child: Center(child: Text('Grid \$index')))),
+	);
+	```
+
+	## SingleChildScrollView
+	**Description:** Scrollable area for a single child.
+	```dart
+	SingleChildScrollView(
+	  child: Column(
+	    children: List.generate(10, (index) => Text('Item \$index')),
+	  ),
+	);
+	```
+
+	## CustomScrollView
+	**Description:** Scrollable area with multiple slivers.
+	```dart
+	CustomScrollView(
+	  slivers: [
+	    SliverAppBar(expandedHeight: 100, flexibleSpace: FlexibleSpaceBar(title: Text('Sliver'))),
+	    SliverList(
+	      delegate: SliverChildBuilderDelegate(
+		(context, index) => ListTile(title: Text('Item \$index')),
+		childCount: 5,
+	      ),
+	    ),
+	  ],
+	);
+	```
+
+	## Scrollbar
+	**Description:** Adds scrollbar to a scrollable widget.
+	```dart
+	Scrollbar(
+	  child: ListView.builder(
+	    itemCount: 20,
+	    itemBuilder: (context, index) => ListTile(title: Text('Item \$index')),
+	  ),
+	);
+	```
+
+	## ReorderableListView
+	**Description:** ListView with drag-and-drop reordering.
+	```dart
+	ReorderableListView(
+	  onReorder: (oldIndex, newIndex) {},
+	  children: List.generate(5, (index) => ListTile(key: ValueKey(index), title: Text('Item \$index'))),
+	);
+	```
+
+	## Wrap
+	**Description:** Wraps children into multiple horizontal/vertical runs.
+	```dart
+	Wrap(
+	  spacing: 8,
+	  runSpacing: 4,
+	  children: List.generate(5, (index) => Chip(label: Text('Chip \$index'))),
+	);
+	```
+
+	## Flow
+	**Description:** Advanced control over children positioning.
+	```dart
+	Flow(
+	  delegate: MyFlowDelegate(),
+	  children: List.generate(3, (index) => Container(width: 50, height: 50, color: Colors.primaries[index])),
+	);
+	```
+
+	## Table
+	**Description:** Creates a table layout.
+	```dart
+	Table(
+	  border: TableBorder.all(),
+	  children: const [
+	    TableRow(children: [Text('A1'), Text('B1')]),
+	    TableRow(children: [Text('A2'), Text('B2')]),
+	  ],
+	);
+	```
+
+	## TableRow / TableCell
+	**Description:** Rows and cells inside a Table.
+	```dart
+	TableRow(children: [Text('Row1 Col1'), Text('Row1 Col2')]);
+	TableCell(child: Text('Cell'));
+	```
+
+	## FittedBox
+	**Description:** Scales and positions child within bounds.
+	```dart
+	FittedBox(
+	  fit: BoxFit.contain,
+	  child: Text('Fitted Text', style: TextStyle(fontSize: 50)),
+	);
+	```
+
+	## Baseline
+	**Description:** Aligns children based on baseline.
+	```dart
+	Row(
+	  crossAxisAlignment: CrossAxisAlignment.baseline,
+	  textBaseline: TextBaseline.alphabetic,
+	  children: const [
+	    Text('Hello', style: TextStyle(fontSize: 20)),
+	    Text('World', style: TextStyle(fontSize:
+
+		
+	################Chapter 5###########################################
+
+		####Text & Input Widgets######
+
+	- Text, RichText, SelectableText, DefaultTextStyle
+	- TextField, TextFormField, Form, Autocomplete, EditableText
+	- Focus, FocusScope, KeyboardListener, MouseRegion
+	- Tooltip
+
+
+	## Text
+	**Description:** Displays a string of text with style.
+	```dart
+	Text(
+	  'Hello Flutter',
+	  style: TextStyle(fontSize: 24, color: Colors.blue, fontWeight: FontWeight.bold),
+	);
+	```
+
+	## RichText
+	**Description:** Displays text with multiple styles.
+	```dart
+	RichText(
+	  text: TextSpan(
+	    text: 'Hello ',
+	    style: TextStyle(color: Colors.black, fontSize: 20),
+	    children: [TextSpan(text: 'Flutter', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold))],
+	  ),
+	);
+	```
+
+	## SelectableText
+	**Description:** Text that can be selected and copied.
+	```dart
+	SelectableText('You can select this text');
+	```
+
+	## DefaultTextStyle
+	**Description:** Sets default text style for children.
+	```dart
+	DefaultTextStyle(
+	  style: TextStyle(color: Colors.red, fontSize: 18),
+	  child: Column(
+	    children: const [
+	      Text('Text 1'),
+	      Text('Text 2'),
+	    ],
+	  ),
+	);
+	```
+
+	## TextField
+	**Description:** Single-line or multi-line text input.
+	```dart
+	TextField(
+	  decoration: InputDecoration(labelText: 'Enter your name'),
+	);
+	```
+
+	## TextFormField
+	**Description:** Text input with validation inside a Form.
+	```dart
+	Form(
+	  child: TextFormField(
+	    decoration: const InputDecoration(labelText: 'Email'),
+	    validator: (value) => value!.isEmpty ? 'Cannot be empty' : null,
+	  ),
+	);
+	```
+
+	## Form
+	**Description:** Container for form fields with validation.
+	```dart
+	final _formKey = GlobalKey<FormState>();
+	Form(
+	  key: _formKey,
+	  child: Column(
+	    children: [
+	      TextFormField(decoration: const InputDecoration(labelText: 'Name')),
+	      ElevatedButton(
+		onPressed: () {
+		  if (_formKey.currentState!.validate()) {
+		    print('Form valid');
+		  }
+		},
+		child: const Text('Submit'),
+	      ),
+	    ],
+	  ),
+	);
+	```
+
+	## Autocomplete
+	**Description:** Suggests options as user types.
+	```dart
+	Autocomplete<String>(
+	  optionsBuilder: (TextEditingValue textEditingValue) {
+	    return ['Apple', 'Banana', 'Cherry']
+	      .where((option) => option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+	  },
+	);
+	```
+
+	## EditableText
+	**Description:** Low-level editable text field. Usually used inside TextField.
+	```dart
+	EditableText(
+	  controller: TextEditingController(),
+	  focusNode: FocusNode(),
+	  style: const TextStyle(color: Colors.black, fontSize: 18),
+	  cursorColor: Colors.blue,
+	  backgroundCursorColor: Colors.grey,
+	);
+	```
+
+	## Focus
+	**Description:** Manages focus on a widget.
+	```dart
+	Focus(
+	  child: TextField(),
+	  onFocusChange: (hasFocus) => print('Focus changed: \$hasFocus'),
+	);
+	```
+
+	## FocusScope
+	**Description:** Groups focusable widgets.
+	```dart
+	FocusScope(
+	  child: Column(
+	    children: const [TextField(), TextField()],
+	  ),
+	);
+	```
+
+	## KeyboardListener
+	**Description:** Listens to keyboard events.
+	```dart
+	KeyboardListener(
+	  focusNode: FocusNode(),
+	  onKeyEvent: (event) => print('Key pressed: \$event'),
+	  child: const TextField(),
+	);
+	```
+
+	## MouseRegion
+	**Description:** Detects mouse movements and hover events.
+	```dart
+	MouseRegion(
+	  onEnter: (_) => print('Mouse entered'),
+	  onExit: (_) => print('Mouse exited'),
+	  child: Container(width: 100, height: 50, color: Colors.green),
+	);
+	```
+
+	## Tooltip
+	**Description:** Shows a hint when hovering or long pressing.
+	```dart
+	Tooltip(
+	  message: 'This is a tooltip',
+	  child: Icon(Icons.info),
+	);
+	```
+
+        ##########################Chapter 6#########################
+
+		#####Buttons & Interactive Widgets######
+
+	- ElevatedButton, TextButton, OutlinedButton, IconButton, FloatingActionButton, PopupMenuButton
+	- CupertinoButton, ToggleButtons, DropdownButton, DropdownMenuItem
+	- InkWell, InkResponse, GestureDetector, Draggable, DragTarget, Dismissible, Listener
+	- Checkbox, Radio, Switch, Slider, RangeSlider, CupertinoSwitch, CupertinoSlider
+
+
+
+	## ElevatedButton
+	**Description:** Raised button with background color.
+	```dart
+	ElevatedButton(
+	  onPressed: () {},
+	  child: const Text('Elevated Button'),
+	);
+	```
+
+	## TextButton
+	**Description:** Flat button with no elevation.
+	```dart
+	TextButton(
+	  onPressed: () {},
+	  child: const Text('Text Button'),
+	);
+	```
+
+	## OutlinedButton
+	**Description:** Button with outline border.
+	```dart
+	OutlinedButton(
+	  onPressed: () {},
+	  child: const Text('Outlined Button'),
+	);
+	```
+
+	## IconButton
+	**Description:** Button showing only an icon.
+	```dart
+	IconButton(
+	  onPressed: () {},
+	  icon: const Icon(Icons.thumb_up),
+	);
+	```
+
+	## FloatingActionButton
+	**Description:** Circular button floating above content.
+	```dart
+	FloatingActionButton(
+	  onPressed: () {},
+	  child: const Icon(Icons.add),
+	);
+	```
+
+	## PopupMenuButton
+	**Description:** Button showing a popup menu.
+	```dart
+	PopupMenuButton<String>(
+	  itemBuilder: (context) => [
+	    const PopupMenuItem(value: 'Option1', child: Text('Option 1')),
+	    const PopupMenuItem(value: 'Option2', child: Text('Option 2')),
+	  ],
+	);
+	```
+
+	## CupertinoButton
+	**Description:** iOS-style button.
+	```dart
+	CupertinoButton(
+	  onPressed: () {},
+	  color: CupertinoColors.activeBlue,
+	  child: const Text('Cupertino Button'),
+	);
+	```
+
+	## ToggleButtons
+	**Description:** Group of buttons with toggle behavior.
+	```dart
+	ToggleButtons(
+	  children: const [Icon(Icons.format_bold), Icon(Icons.format_italic)],
+	  isSelected: [true, false],
+	  onPressed: (index) {},
+	);
+	```
+
+	## DropdownButton & DropdownMenuItem
+	**Description:** Drop-down selection menu.
+	```dart
+	DropdownButton<String>(
+	  value: 'One',
+	  items: ['One', 'Two'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+	  onChanged: (value) {},
+	);
+	```
+
+	## InkWell
+	**Description:** Adds ripple effect on tap.
+	```dart
+	InkWell(
+	  onTap: () => print('Tapped'),
+	  child: const Padding(padding: EdgeInsets.all(8), child: Text('Tap Me')),
+	);
+	```
+
+	## InkResponse
+	**Description:** Similar to InkWell, more control over splash.
+	```dart
+	InkResponse(
+	  onTap: () => print('Tapped'),
+	  child: const Icon(Icons.touch_app),
+	);
+	```
+
+	## GestureDetector
+	**Description:** Detects gestures like tap, double tap, long press.
+	```dart
+	GestureDetector(
+	  onDoubleTap: () => print('Double Tapped'),
+	  child: Container(width: 100, height: 50, color: Colors.blue),
+	);
+	```
+
+	## Draggable
+	**Description:** Makes a widget draggable.
+	```dart
+	Draggable<int>(
+	  data: 1,
+	  feedback: Container(width: 50, height: 50, color: Colors.red),
+	  child: Container(width: 50, height: 50, color: Colors.green),
+	);
+	```
+
+	## DragTarget
+	**Description:** Receives draggable widgets.
+	```dart
+	DragTarget<int>(
+	  onAccept: (data) => print('Accepted: \$data'),
+	  builder: (context, candidateData, rejectedData) => Container(width: 100, height: 100, color: Colors.yellow),
+	);
+	```
+
+	## Dismissible
+	**Description:** Swipe-to-dismiss widget.
+	```dart
+	Dismissible(
+	  key: const ValueKey(1),
+	  onDismissed: (direction) => print('Dismissed'),
+	  child: ListTile(title: Text('Swipe me')),
+	);
+	```
+
+	## Listener
+	**Description:** Detects raw pointer events.
+	```dart
+	Listener(
+	  onPointerDown: (_) => print('Pointer down'),
+	  child: Container(width: 100, height: 50, color: Colors.orange),
+	);
+	```
+
+	## Checkbox
+	**Description:** On/off check box.
+	```dart
+	Checkbox(
+	  value: true,
+	  onChanged: (value) {},
+	);
+	```
+
+	## Radio
+	**Description:** Radio button for single selection.
+	```dart
+	Radio<int>(
+	  value: 1,
+	  groupValue: 1,
+	  onChanged: (value) {},
+	);
+	```
+
+	## Switch
+	**Description:** Toggle switch.
+	```dart
+	Switch(
+	  value: true,
+	  onChanged: (value) {},
+	);
+	```
+
+	## Slider
+	**Description:** Select numeric value with a slider.
+	```dart
+	Slider(value: 0.5, onChanged: (value) {});
+	```
+
+	## RangeSlider
+	**Description:** Select numeric range.
+	```dart
+	RangeSlider(values: const RangeValues(0.2, 0.8), onChanged: (values) {});
+	```
+
+	## CupertinoSwitch
+	**Description:** iOS-style switch.
+	```dart
+	CupertinoSwitch(value: true, onChanged: (value) {});
+
+		
+	################Chapter 7###########################
+
+		######Images & Icons######
+
+	- Image, Image.asset, Image.network, Image.file, FadeInImage
+	- Icon, IconButton, CircleAvatar, FlutterLogo
+	- Placeholder, FadeTransition, Hero
+
+
+
+	## Image
+	**Description:** Displays an image.
+	```dart
+	Image.asset('assets/sample.png');
+	```
+
+	## Image.asset
+	**Description:** Loads image from local assets.
+	```dart
+	Image.asset('assets/flutter.png', width: 100, height: 100);
+	```
+
+	## Image.network
+	**Description:** Loads image from a network URL.
+	```dart
+	Image.network('https://flutter.dev/images/flutter-logo-sharing.png', width: 100, height: 100);
+	```
+
+	## Image.file
+	**Description:** Loads image from device file.
+	```dart
+	import 'dart:io';
+	Image.file(File('/path/to/image.png'));
+	```
+
+	## FadeInImage
+	**Description:** Image that fades in from a placeholder.
+	```dart
+	FadeInImage.assetNetwork(
+	  placeholder: 'assets/placeholder.png',
+	  image: 'https://flutter.dev/images/flutter-logo-sharing.png',
+	);
+	```
+
+	## Icon
+	**Description:** Displays an icon.
+	```dart
+	Icon(Icons.favorite, color: Colors.red, size: 30);
+	```
+
+	## IconButton
+	**Description:** Button with an icon.
+	```dart
+	IconButton(
+	  icon: Icon(Icons.thumb_up),
+	  onPressed: () {},
+	);
+	```
+
+	## CircleAvatar
+	**Description:** Circular avatar for image or text.
+	```dart
+	CircleAvatar(
+	  radius: 30,
+	  backgroundImage: AssetImage('assets/avatar.png'),
+	);
+	```
+
+	## FlutterLogo
+	**Description:** Displays Flutter logo.
+	```dart
+	FlutterLogo(size: 100);
+	```
+
+	## Placeholder
+	**Description:** Placeholder widget for layout.
+	```dart
+	Placeholder(color: Colors.red, fallbackWidth: 100, fallbackHeight: 50);
+	```
+
+	## FadeTransition
+	**Description:** Fades a widget in/out using Animation.
+	```dart
+	AnimationController _controller = AnimationController(vsync: this, duration: Duration(seconds: 2));
+	FadeTransition(
+	  opacity: _controller,
+	  child: const Text('Fade Me'),
+	);
+	```
+
+	## Hero
+	**Description:** Hero animation for seamless transition between screens.
+	```dart
+	Hero(
+	  tag: 'hero-logo',
+	  child: Image.asset('assets/flutter.png', wi
+
+	##############Chapter 8###################################
+
+		#####Animation & Motion Widgets######
+
+	- AnimatedContainer, AnimatedOpacity, AnimatedPadding, AnimatedAlign, AnimatedPositioned
+	- AnimatedBuilder, AnimatedSwitcher, AnimatedList, AnimatedIcon
+	- AnimationController, Tween, CurvedAnimation, SlideTransition, ScaleTransition, RotationTransition, FadeTransition
+	- Hero, PageRouteBuilder, PageTransition, AnimatedCrossFade, ReorderableListView
+
+
+
+	## AnimatedContainer
+	**Description:** A container that automatically animates changes to its properties.
+	```dart
+	AnimatedContainer(
+	  duration: Duration(seconds: 1),
+	  width: 100,
+	  height: 100,
+	  color: Colors.blue,
+	  child: Center(child: Text('Animated Container')),
+	);
+	```
+
+	## AnimatedOpacity
+	**Description:** Animates the opacity of a child.
+	```dart
+	AnimatedOpacity(
+	  duration: Duration(seconds: 1),
+	  opacity: 0.5,
+	  child: Text('Fade Me'),
+	);
+	```
+
+	## AnimatedPadding
+	**Description:** Animates changes to padding.
+	```dart
+	AnimatedPadding(
+	  duration: Duration(seconds: 1),
+	  padding: EdgeInsets.all(20),
+	  child: Container(color: Colors.red, width: 50, height: 50),
+	);
+	```
+
+	## AnimatedAlign
+	**Description:** Animates the alignment of a child.
+	```dart
+	AnimatedAlign(
+	  duration: Duration(seconds: 1),
+	  alignment: Alignment.bottomRight,
+	  child: Container(color: Colors.green, width: 50, height: 50),
+	);
+	```
+
+	## AnimatedPositioned
+	**Description:** Animates the position of a child inside a Stack.
+	```dart
+	Stack(
+	  children: [
+	    AnimatedPositioned(
+	      duration: Duration(seconds: 1),
+	      top: 50,
+	      left: 50,
+	      child: Container(color: Colors.orange, width: 50, height: 50),
+	    ),
+	  ],
+	);
+	```
+
+	## AnimatedBuilder
+	**Description:** Rebuilds widgets based on an animation.
+	```dart
+	AnimationController _controller = AnimationController(vsync: this, duration: Duration(seconds: 2));
+	AnimatedBuilder(
+	  animation: _controller,
+	  builder: (context, child) {
+	    return Transform.rotate(
+	      angle: _controller.value * 2 * pi,
+	      child: child,
+	    );
+	  },
+	  child: Container(width: 50, height: 50, color: Colors.blue),
+	);
+	```
+
+	## AnimatedSwitcher
+	**Description:** Switches between two widgets with animation.
+	```dart
+	AnimatedSwitcher(
+	  duration: Duration(seconds: 1),
+	  child: Text('Hello', key: ValueKey(1)),
+	);
+	```
+
+	## AnimatedList
+	**Description:** Animated insertion and removal of items in a list.
+	```dart
+	AnimatedList(
+	  key: GlobalKey<AnimatedListState>(),
+	  initialItemCount: 0,
+	  itemBuilder: (context, index, animation) {
+	    return FadeTransition(opacity: animation, child: ListTile(title: Text('Item \$index')));
+	  },
+	);
+	```
+
+	## AnimatedIcon
+	**Description:** Animated icons for common actions.
+	```dart
+	AnimatedIcon(
+	  icon: AnimatedIcons.menu_close,
+	  progress: _controller,
+	);
+	```
+
+	## AnimationController
+	**Description:** Controls an animation, defines duration, repeats, etc.
+	```dart
+	AnimationController _controller = AnimationController(vsync: this, duration: Duration(seconds: 2));
+	_controller.forward();
+	```
+
+	## Tween
+	**Description:** Defines the range of animation values.
+	```dart
+	Tween<double>(begin: 0, end: 1).animate(_controller);
+	```
+
+	## CurvedAnimation
+	**Description:** Adds easing curves to animations.
+	```dart
+	CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+	```
+
+	## SlideTransition
+	**Description:** Animates position using a fractional offset.
+	```dart
+	SlideTransition(
+	  position: Tween<Offset>(begin: Offset(0,1), end: Offset(0,0)).animate(_controller),
+	  child: Container(color: Colors.red, width: 50, height: 50),
+	);
+	```
+
+	## ScaleTransition
+	**Description:** Animates scale of a widget.
+	```dart
+	ScaleTransition(
+	  scale: Tween<double>(begin: 0, end: 1).animate(_controller),
+	  child: Container(color: Colors.blue, width: 50, height: 50),
+	);
+	```
+
+	## RotationTransition
+	**Description:** Animates rotation of a widget.
+	```dart
+	RotationTransition(
+	  turns: Tween<double>(begin: 0, end: 1).animate(_controller),
+	  child: Container(color: Colors.green, width: 50, height: 50),
+	);
+	```
+
+	## FadeTransition
+	**Description:** Animates opacity.
+	```dart
+	FadeTransition(
+	  opacity: Tween<double>(begin: 0, end: 1).animate(_controller),
+	  child: Text('Fade In'),
+	);
+	```
+
+	## Hero
+	**Description:** Animates a widget from one screen to another.
+	```dart
+	Hero(
+	  tag: 'hero-logo',
+	  child: Image.asset('assets/flutter.png', width: 50, height: 50),
+	);
+	```
+
+	## PageRouteBuilder
+	**Description:** Custom page transitions.
+	```dart
+	Navigator.push(context, PageRouteBuilder(
+	  pageBuilder: (_, __, ___) => SecondScreen(),
+	  transitionsBuilder: (_, animation, __, child) {
+	    return FadeTransition(opacity: animation, child: child);
+	  },
+	));
+	```
+
+	## PageTransition
+	**Description:** Predefined page transition animations (requires package: page_transition).
+	```dart
+	PageTransition(type: PageTransitionType.fade, child: SecondScreen());
+	```
+
+	## AnimatedCrossFade
+	**Description:** Crossfade between two children.
+	```dart
+	AnimatedCrossFade(
+	  duration: Duration(seconds: 1),
+	  firstChild: Container(color: Colors.red, width: 50, height: 50),
+	  secondChild: Container(color: Colors.blue, width: 50, height: 50),
+	  crossFadeState: CrossFadeState.showSecond,
+	);
+	```
+
+	## ReorderableListView
+	**Description:** Allows items in a list to be reordered with drag.
+	```dart
+	ReorderableListView(
+	  onReorder: (oldIndex, newIndex) {},
+	  children: List.generate(5, (index) => ListTile(key: ValueKey(index), title: Text('Item \$index'))),
+	);
+	```
+
+	###################Chapter 9###############################
+
+			####Gesture & Interaction#####
+
+	- GestureDetector, Listener, MouseRegion, Draggable, DragTarget, Dismissible, InteractiveViewer
+	- LongPressDraggable, ReorderableListView, AbsorbPointer, IgnorePointer, RawGestureDetector
+
+
+	## GestureDetector
+	**Description:** Detects gestures like tap, double tap, long press.
+	```dart
+	GestureDetector(
+	  onTap: () => print('Tapped'),
+	  onDoubleTap: () => print('Double Tapped'),
+	  onLongPress: () => print('Long Pressed'),
+	  child: Container(width: 100, height: 50, color: Colors.blue),
+	);
+	```
+
+	## Listener
+	**Description:** Detects raw pointer events like down, move, up.
+	```dart
+	Listener(
+	  onPointerDown: (_) => print('Pointer down'),
+	  onPointerMove: (_) => print('Pointer move'),
+	  child: Container(width: 100, height: 50, color: Colors.orange),
+	);
+	```
+
+	## MouseRegion
+	**Description:** Detects mouse hover, enter, exit events.
+	```dart
+	MouseRegion(
+	  onEnter: (_) => print('Mouse entered'),
+	  onExit: (_) => print('Mouse exited'),
+	  child: Container(width: 100, height: 50, color: Colors.green),
+	);
+	```
+
+	## Draggable
+	**Description:** Makes a widget draggable.
+	```dart
+	Draggable<int>(
+	  data: 1,
+	  feedback: Container(width: 50, height: 50, color: Colors.red),
+	  child: Container(width: 50, height: 50, color: Colors.green),
+	);
+	```
+
+	## DragTarget
+	**Description:** Receives draggable widgets.
+	```dart
+	DragTarget<int>(
+	  onAccept: (data) => print('Accepted: \$data'),
+	  builder: (context, candidateData, rejectedData) => Container(width: 100, height: 100, color: Colors.yellow),
+	);
+	```
+
+	## Dismissible
+	**Description:** Swipe-to-dismiss widget.
+	```dart
+	Dismissible(
+	  key: const ValueKey(1),
+	  onDismissed: (direction) => print('Dismissed'),
+	  child: ListTile(title: Text('Swipe me')),
+	);
+	```
+
+	## InteractiveViewer
+	**Description:** Adds pan, zoom, and rotation interactions.
+	```dart
+	InteractiveViewer(
+	  child: Image.asset('assets/sample.png', width: 200, height: 200),
+	);
+	```
+
+	## LongPressDraggable
+	**Description:** Starts dragging on long press.
+	```dart
+	LongPressDraggable<int>(
+	  data: 1,
+	  feedback: Container(width: 50, height: 50, color: Colors.purple),
+	  child: Container(width: 50, height: 50, color: Colors.orange),
+	);
+	```
+
+	## ReorderableListView
+	**Description:** Allows items in a list to be reordered via drag.
+	```dart
+	ReorderableListView(
+	  onReorder: (oldIndex, newIndex) {},
+	  children: List.generate(5, (index) => ListTile(key: ValueKey(index), title: Text('Item \$index'))),
+	);
+	```
+
+	## AbsorbPointer
+	**Description:** Prevents child from receiving pointer events.
+	```dart
+	AbsorbPointer(
+	  child: ElevatedButton(onPressed: () => print('Will not trigger'), child: Text('Button')),
+	);
+	```
+
+	## IgnorePointer
+	**Description:** Similar to AbsorbPointer but ignores child for hit testing.
+	```dart
+	IgnorePointer(
+	  child: ElevatedButton(onPressed: () => print('Ignored'), child: Text('Button')),
+	);
+	```
+
+	## RawGestureDetector
+	**Description:** Low-level gesture detection.
+	```dart
+	RawGestureDetector(
+	  gestures: {
+	    TapGestureRecognizer: GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
+	      () => TapGestureRecognizer(),
+	      (instance) => instance.onTap = () => print('Raw tap detected'),
+	    )
+	  },
+	  child: Container(width: 100, height: 50, color: Colors.teal),
+	);
+	```
+	####################Chapter 10############################
+
+			####Dialogs, Popups & Overlay######
+
+	- AlertDialog, SimpleDialog, CupertinoAlertDialog, CupertinoActionSheet
+	- SnackBar, BottomSheet, ModalBottomSheet, PersistentBottomSheet
+	- Tooltip, Overlay, OverlayEntry, PopupMenuButton
+
+
+	## AlertDialog
+	**Description:** Displays a Material Design alert dialog with title, content, and actions.
+	```dart
+	showDialog(
+	  context: context,
+	  builder: (context) => AlertDialog(
+	    title: Text('Alert'),
+	    content: Text('This is an alert dialog'),
+	    actions: [
+	      TextButton(onPressed: () => Navigator.pop(context), child: Text('OK')),
+	    ],
+	  ),
+	);
+	```
+
+	## SimpleDialog
+	**Description:** Displays a dialog with options for the user to choose.
+	```dart
+	showDialog(
+	  context: context,
+	  builder: (context) => SimpleDialog(
+	    title: Text('Choose an option'),
+	    children: [
+	      SimpleDialogOption(onPressed: () => Navigator.pop(context, 'Option 1'), child: Text('Option 1')),
+	      SimpleDialogOption(onPressed: () => Navigator.pop(context, 'Option 2'), child: Text('Option 2')),
+	    ],
+	  ),
+	);
+	```
+
+	## CupertinoAlertDialog
+	**Description:** iOS-style alert dialog.
+	```dart
+	showCupertinoDialog(
+	  context: context,
+	  builder: (context) => CupertinoAlertDialog(
+	    title: Text('iOS Alert'),
+	    content: Text('This is a Cupertino AlertDialog'),
+	    actions: [
+	      CupertinoDialogAction(child: Text('OK'), onPressed: () => Navigator.pop(context)),
+	    ],
+	  ),
+	);
+	```
+
+	## CupertinoActionSheet
+	**Description:** iOS-style action sheet for multiple actions.
+	```dart
+	showCupertinoModalPopup(
+	  context: context,
+	  builder: (context) => CupertinoActionSheet(
+	    title: Text('Actions'),
+	    actions: [
+	      CupertinoActionSheetAction(child: Text('Action 1'), onPressed: () => Navigator.pop(context)),
+	      CupertinoActionSheetAction(child: Text('Action 2'), onPressed: () => Navigator.pop(context)),
+	    ],
+	    cancelButton: CupertinoActionSheetAction(child: Text('Cancel'), onPressed: () => Navigator.pop(context)),
+	  ),
+	);
+	```
+
+	## SnackBar
+	**Description:** Shows a temporary message at the bottom of the screen.
+	```dart
+	ScaffoldMessenger.of(context).showSnackBar(
+	  SnackBar(content: Text('This is a snackbar'), duration: Duration(seconds: 2)),
+	);
+	```
+
+	## BottomSheet
+	**Description:** Displays a bottom sheet widget.
+	```dart
+	Scaffold(
+	  body: Center(child: ElevatedButton(
+	    onPressed: () {
+	      showBottomSheet(context: context, builder: (context) => Container(height: 200, color: Colors.blue, child: Center(child: Text('Bottom Sheet'))));
+	    },
+	    child: Text('Show Bottom Sheet'),
+	  )),
+	);
+	```
+
+	## ModalBottomSheet
+	**Description:** Modal sheet that blocks interaction with background.
+	```dart
+	showModalBottomSheet(
+	  context: context,
+	  builder: (context) => Container(height: 200, color: Colors.green, child: Center(child: Text('Modal Bottom Sheet'))),
+	);
+	```
+
+	## PersistentBottomSheet
+	**Description:** Bottom sheet that stays open until closed.
+	```dart
+	Scaffold(
+	  body: Builder(builder: (context) {
+	    return Center(
+	      child: ElevatedButton(
+		onPressed: () {
+		  Scaffold.of(context).showBottomSheet((context) => Container(height: 200, color: Colors.orange, child: Center(child: Text('Persistent Bottom Sheet'))));
+		},
+		child: Text('Show Persistent Sheet'),
+	      ),
+	    );
+	  }),
+	);
+	```
+
+	## Tooltip
+	**Description:** Displays a message when hovering or long-pressing.
+	```dart
+	Tooltip(message: 'This is a tooltip', child: Icon(Icons.info));
+	```
+
+	## Overlay & OverlayEntry
+	**Description:** Displays widgets above the current UI.
+	```dart
+	OverlayState overlayState = Overlay.of(context)!;
+	OverlayEntry entry = OverlayEntry(builder: (context) => Positioned(top: 50, left: 50, child: Material(child: Text('Overlay Text'))));
+	overlayState.insert(entry);
+	// To remove: entry.remove();
+	```
+
+	## PopupMenuButton
+	**Description:** Shows a popup menu when pressed.
+	```dart
+	PopupMenuButton<String>(
+	  onSelected: (value) => print('Selected: \$value'),
+	  itemBuilder: (context) => [
+	    PopupMenuItem(value: 'One', child: Text('Option One')),
+
+
+
+	################################Chapter 11###################################
+
+			#######Painting & Custom UI#########
+
+	- CustomPaint, Canvas, ClipRect, ClipRRect, ClipOval, ClipPath, ShaderMask, BackdropFilter, DecoratedBox
+	- Transform, Opacity, FractionalTranslation, RotatedBox, RotatedTransition, SizedOverflowBox
+
+
+	## CustomPaint
+	**Description:** Widget that delegates painting to a custom painter.
+	```dart
+	CustomPaint(
+	  size: Size(100, 100),
+	  painter: MyPainter(),
+	);
+
+	class MyPainter extends CustomPainter {
+	  @override
+	  void paint(Canvas canvas, Size size) {
+	    Paint paint = Paint()..color = Colors.blue;
+	    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
+	  }
+	  @override
+	  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+	}
+	```
+
+	## Canvas
+	**Description:** Low-level painting API used inside CustomPainter.
+	```dart
+	// Used inside CustomPainter.paint
+	canvas.drawCircle(Offset(50,50), 40, Paint()..color=Colors.red);
+	```
+
+	## ClipRect
+	**Description:** Clips its child to a rectangle.
+	```dart
+	ClipRect(
+	  child: Container(color: Colors.blue, width: 100, height: 100),
+	);
+	```
+
+	## ClipRRect
+	**Description:** Clips its child with rounded rectangle.
+	```dart
+	ClipRRect(
+	  borderRadius: BorderRadius.circular(20),
+	  child: Container(color: Colors.red, width: 100, height: 100),
+	);
+	```
+
+	## ClipOval
+	**Description:** Clips its child to an oval/circle.
+	```dart
+	ClipOval(
+	  child: Container(color: Colors.green, width: 100, height: 100),
+	);
+	```
+
+	## ClipPath
+	**Description:** Clips child using a custom path.
+	```dart
+	ClipPath(
+	  clipper: MyClipper(),
+	  child: Container(color: Colors.orange, width: 100, height: 100),
+	);
+
+	class MyClipper extends CustomClipper<Path> {
+	  @override
+	  Path getClip(Size size) {
+	    Path path = Path();
+	    path.lineTo(0, size.height);
+	    path.lineTo(size.width, 0);
+	    path.close();
+	    return path;
+	  }
+	  @override
+	  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+	}
+	```
+
+	## ShaderMask
+	**Description:** Applies a shader effect to its child.
+	```dart
+	ShaderMask(
+	  shaderCallback: (rect) => LinearGradient(colors: [Colors.red, Colors.blue]).createShader(rect),
+	  child: Text('Shader', style: TextStyle(fontSize: 40, color: Colors.white)),
+	);
+	```
+
+	## BackdropFilter
+	**Description:** Applies a filter to background behind the child.
+	```dart
+	BackdropFilter(
+	  filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+	  child: Container(color: Colors.white.withOpacity(0.2)),
+	);
+	```
+
+	## DecoratedBox
+	**Description:** Decorates its child with background, border, shadow, etc.
+	```dart
+	DecoratedBox(
+	  decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(10)),
+	  child: Padding(padding: EdgeInsets.all(20), child: Text('Decorated')),
+	);
+	```
+
+	## Transform
+	**Description:** Applies a transformation (scale, rotate, translate) to child.
+	```dart
+	Transform.rotate(
+	  angle: pi/4,
+	  child: Container(color: Colors.red, width: 50, height: 50),
+	);
+	```
+
+	## Opacity
+	**Description:** Makes child partially transparent.
+	```dart
+	Opacity(
+	  opacity: 0.5,
+	  child: Container(color: Colors.green, width: 100, height: 100),
+	);
+	```
+
+	## FractionalTranslation
+	**Description:** Moves child by fraction of its size.
+	```dart
+	FractionalTranslation(
+	  translation: Offset(0.2, 0),
+	  child: Container(color: Colors.orange, width: 50, height: 50),
+	);
+	```
+
+	## RotatedBox
+	**Description:** Rotates child in 90-degree increments.
+	```dart
+	RotatedBox(
+	  quarterTurns: 1,
+	  child: Container(color: Colors.blue, width: 50, height: 50),
+	);
+	```
+
+	## RotatedTransition
+	**Description:** Rotates child using animation.
+	```dart
+	RotationTransition(
+	  turns: Tween(begin: 0.0, end: 1.0).animate(_controller),
+	  child: Container(color: Colors.purple, width: 50, height: 50),
+	);
+	```
+
+	## SizedOverflowBox
+	**Description:** Sizes its child differently than its own size.
+	```dart
+	SizedOverflowBox(
+	  size: Size(100, 100),
+	  child: Container(color: Colors.yellow, width: 200, height: 200),
+	);
+	```
+
+
+	###########################Chapter 12##################################
+
+		#############Async & Builders###############
+
+	- FutureBuilder, StreamBuilder, LayoutBuilder, OrientationBuilder, ValueListenableBuilder, AnimatedBuilder
+	- ListenableBuilder, Builder, IndexedStack
+
+
+
+	## FutureBuilder
+	**Description:** Builds widgets based on a Future's state.
+	```dart
+	FutureBuilder<String>(
+	  future: Future.delayed(Duration(seconds: 2), () => 'Hello Future'),
+	  builder: (context, snapshot) {
+	    if (snapshot.connectionState == ConnectionState.waiting) {
+	      return CircularProgressIndicator();
+	    } else if (snapshot.hasError) {
+	      return Text('Error: \${snapshot.error}');
+	    } else {
+	      return Text('Result: \${snapshot.data}');
+	    }
+	  },
+	);
+	```
+
+	## StreamBuilder
+	**Description:** Builds widgets based on a Stream's state.
+	```dart
+	StreamBuilder<int>(
+	  stream: Stream.periodic(Duration(seconds: 1), (i) => i).take(5),
+	  builder: (context, snapshot) {
+	    if (!snapshot.hasData) return CircularProgressIndicator();
+	    return Text('Value: \${snapshot.data}');
+	  },
+	);
+	```
+
+	## LayoutBuilder
+	**Description:** Builds widgets based on parent constraints.
+	```dart
+	LayoutBuilder(
+	  builder: (context, constraints) {
+	    if (constraints.maxWidth < 200) {
+	      return Text('Small layout');
+	    } else {
+	      return Text('Large layout');
+	    }
+	  },
+	);
+	```
+
+	## OrientationBuilder
+	**Description:** Builds widgets based on device orientation.
+	```dart
+	OrientationBuilder(
+	  builder: (context, orientation) {
+	    if (orientation == Orientation.portrait) {
+	      return Text('Portrait');
+	    } else {
+	      return Text('Landscape');
+	    }
+	  },
+	);
+	```
+
+	## ValueListenableBuilder
+	**Description:** Rebuilds widget when a ValueNotifier changes.
+	```dart
+	ValueNotifier<int> counter = ValueNotifier(0);
+	ValueListenableBuilder<int>(
+	  valueListenable: counter,
+	  builder: (context, value, child) {
+	    return Text('Value: \$value');
+	  },
+	);
+	```
+
+	## AnimatedBuilder
+	**Description:** Rebuilds child widgets when an animation changes.
+	```dart
+	AnimationController _controller = AnimationController(vsync: this, duration: Duration(seconds: 2));
+	AnimatedBuilder(
+	  animation: _controller,
+	  builder: (context, child) {
+	    return Transform.rotate(angle: _controller.value * 2 * pi, child: child);
+	  },
+	  child: Icon(Icons.refresh, size: 50),
+	);
+	```
+
+	## ListenableBuilder
+	**Description:** Rebuilds widgets when a Listenable changes (like ChangeNotifier).
+	```dart
+	ChangeNotifier myNotifier = ChangeNotifier();
+	ListenableBuilder(
+	  listenable: myNotifier,
+	  builder: (context, _) {
+	    return Text('Notifier triggered');
+	  },
+	);
+	```
+
+	## Builder
+	**Description:** Provides a new BuildContext.
+	```dart
+	Builder(
+	  builder: (context) {
+	    return Text('Builder widget');
+	  },
+	);
+	```
+
+	## IndexedStack
+	**Description:** Displays only the child at the given index.
+	```dart
+	IndexedStack(
+	  index: 1,
+	  children: [
+	    Text('First'),
+	    Text('Second'),
+	    Text('Thir
+
+      #############################Chapter 13##############################
+
+		########Miscellaneous Widgets#######
+
+	- Spacer, Divider, VerticalDivider, SizedBox, ConstrainedBox, FractionallySizedBox, AspectRatio
+	- Opacity, Offstage, Visibility, LimitedBox, OverflowBox, FittedBox, FractionalTranslation
+	- InheritedNotifier, InheritedModel, ProxyWidget, MediaQuery, Directionality, ScrollConfiguration
+
+
+	## 🧩 1. Spacer
+	**Purpose:** Creates adjustable empty space in a `Row` or `Column`.
+
+	```dart
+	Row(
+	  children: const [
+	    Icon(Icons.star),
+	    Spacer(),
+	    Icon(Icons.star),
+	  ],
+	)
+	```
+	🟢 *The Spacer pushes the second star to the end of the Row.*
+
+	---
+
+	## 🔹 2. Divider
+	**Purpose:** Creates a horizontal line to separate content.
+
+	```dart
+	Divider(
+	  color: Colors.grey,
+	  thickness: 2,
+	  indent: 20,
+	  endIndent: 20,
+	)
+	```
+	🟢 *Useful in lists or between sections.*
+
+	---
+
+	## 🔹 3. VerticalDivider
+	**Purpose:** Similar to `Divider`, but vertical for `Row` layouts.
+
+	```dart
+	Row(
+	  children: const [
+	    Text('Left'),
+	    VerticalDivider(color: Colors.grey),
+	    Text('Right'),
+	  ],
+	)
+	```
+	🟢 *Separates items vertically in a Row.*
+
+	---
+
+	## 🔹 4. SizedBox
+	**Purpose:** Defines fixed width/height space or a sized container.
+
+	```dart
+	SizedBox(
+	  width: 100,
+	  height: 50,
+	  child: ElevatedButton(onPressed: () {}, child: Text('Click')),
+	)
+	```
+	🟢 *Useful to constrain child size or add fixed space.*
+
+	---
+
+	## 🔹 5. ConstrainedBox
+	**Purpose:** Applies constraints (min/max width or height) on a child.
+
+	```dart
+	ConstrainedBox(
+	  constraints: BoxConstraints(
+	    minWidth: 100,
+	    maxWidth: 200,
+	    minHeight: 50,
+	  ),
+	  child: Container(color: Colors.blue, height: 20, width: 20),
+	)
+	```
+	🟢 *Ensures child respects defined boundaries.*
+
+	---
+
+	## 🔹 6. FractionallySizedBox
+	**Purpose:** Sizes child based on a fraction of parent’s size.
+
+	```dart
+	FractionallySizedBox(
+	  widthFactor: 0.8,
+	  heightFactor: 0.3,
+	  child: Container(color: Colors.green),
+	)
+	```
+	🟢 *E.g., widthFactor 0.8 means 80% of parent width.*
+
+	---
+
+	## 🔹 7. AspectRatio
+	**Purpose:** Maintains width/height ratio.
+
+	```dart
+	AspectRatio(
+	  aspectRatio: 16 / 9,
+	  child: Container(color: Colors.orange),
+	)
+	```
+	🟢 *Useful for images or videos to maintain consistent ratio.*
+
+	---
+
+	## 🔹 8. Opacity
+	**Purpose:** Makes a widget transparent without removing it.
+
+	```dart
+	Opacity(
+	  opacity: 0.5,
+	  child: Text('Half transparent'),
+	)
+	```
+	🟢 *Use `Visibility` instead if widget should be hidden completely.*
+
+	---
+
+	## 🔹 9. Offstage
+	**Purpose:** Hides a widget but keeps it in the widget tree (no layout).
+
+	```dart
+	Offstage(
+	  offstage: true,
+	  child: Text('Invisible but still in tree'),
+	)
+	```
+	🟢 *Good for conditionally showing UI without rebuild.*
+
+	---
+
+	## 🔹 10. Visibility
+	**Purpose:** Controls widget visibility with maintain options.
+
+	```dart
+	Visibility(
+	  visible: false,
+	  maintainState: true,
+	  child: Text('Hidden text'),
+	)
+	```
+	🟢 *`maintainState` keeps layout and animations alive.*
+
+	---
+
+	## 🔹 11. LimitedBox
+	**Purpose:** Restricts child’s size only when unconstrained.
+
+	```dart
+	LimitedBox(
+	  maxWidth: 150,
+	  maxHeight: 100,
+	  child: Container(color: Colors.purple, width: 500, height: 500),
+	)
+	```
+	🟢 *Applies limit only when parent provides no constraints.*
+
+	---
+
+	## 🔹 12. OverflowBox
+	**Purpose:** Allows child to overflow parent constraints.
+
+	```dart
+	OverflowBox(
+	  maxWidth: 200,
+	  maxHeight: 200,
+	  child: Container(width: 300, height: 300, color: Colors.red),
+	)
+	```
+	🟢 *Useful for animations or decorative elements exceeding bounds.*
+
+	---
+
+	## 🔹 13. FittedBox
+	**Purpose:** Scales and fits child within its parent.
+
+	```dart
+	FittedBox(
+	  child: Text('Scaled Text', style: TextStyle(fontSize: 50)),
+	)
+	```
+	🟢 *Prevents text or images from overflowing.*
+
+	---
+
+	## 🔹 14. FractionalTranslation
+	**Purpose:** Shifts child position based on fraction of its size.
+
+	```dart
+	FractionalTranslation(
+	  translation: Offset(0.5, 0.5),
+	  child: Container(width: 100, height: 100, color: Colors.teal),
+	)
+	```
+	🟢 *Moves child without affecting layout size.*
+
+	---
+
+	## 🔹 15. InheritedNotifier
+	**Purpose:** Rebuilds dependents when a `Listenable` (like `ValueNotifier`) changes.
+
+	```dart
+	class CounterNotifier extends ValueNotifier<int> {
+	  CounterNotifier(int value) : super(value);
+	}
+
+	final counter = CounterNotifier(0);
+
+	InheritedNotifier<ValueNotifier<int>>(
+	  notifier: counter,
+	  child: Builder(
+	    builder: (context) {
+	      return Text('${counter.value}');
+	    },
+	  ),
+	)
+	```
+	🟢 *Optimized state updates for parts of the widget tree.*
+
+	---
+
+	## 🔹 16. InheritedModel
+	**Purpose:** Provides fine-grained rebuilds for specific model aspects.
+
+	```dart
+	class ThemeModel extends InheritedModel<String> {
+	  final Color color;
+	  ThemeModel({required this.color, required super.child});
+
+	  static ThemeModel? of(BuildContext context, String aspect) =>
+	      InheritedModel.inheritFrom<ThemeModel>(context, aspect: aspect);
+
+	  @override
+	  bool updateShouldNotify(ThemeModel oldWidget) => color != oldWidget.color;
+
+	  @override
+	  bool updateShouldNotifyDependent(ThemeModel oldWidget, Set<String> aspects) =>
+	      aspects.contains('color');
+	}
+	```
+	🟢 *Rebuilds only widgets that depend on a specific aspect.*
+
+	---
+
+	## 🔹 17. ProxyWidget
+	**Purpose:** Base class for widgets that modify their child’s behavior.
+
+	Examples: `InheritedWidget`, `Theme`, `DefaultTextStyle` are all ProxyWidgets.
+
+	🟢 *Used rarely directly; useful in custom inherited logic.*
+
+	---
+
+	## 🔹 18. MediaQuery
+	**Purpose:** Provides device and screen information.
+
+	```dart
+	var size = MediaQuery.of(context).size;
+	Text('Width: ${size.width}, Height: ${size.height}');
+	```
+	🟢 *Crucial for responsive designs.*
+
+	---
+
+	## 🔹 19. Directionality
+	**Purpose:** Defines text direction (LTR/RTL) for its subtree.
+
+	```dart
+	Directionality(
+	  textDirection: TextDirection.rtl,
+	  child: Text('مرحبا Flutter'),
+	)
+	```
+	🟢 *Essential for supporting right-to-left languages.*
+
+	---
+
+	## 🔹 20. ScrollConfiguration
+	**Purpose:** Customizes scroll behavior (physics, glow, etc.).
+
+	```dart
+	ScrollConfiguration(
+	  behavior: ScrollBehavior().copyWith(scrollbars: false),
+	  child: ListView.builder(
+	    itemCount: 10,
+	    itemBuilder: (_, i) => ListTile(title: Text('Item $i')),
+	  ),
+	)
+	```
+	🟢 *Used to remove overscroll glow or customize scroll effects.*
+
+	---
+
+	✅ **Summary:**
+	These widgets fine-tune layout, visibility, and behavior. They are often combined with containers, lists, or custom logic for responsive, efficient, and polished Flutter UIs.
+
+
+
+
+
+

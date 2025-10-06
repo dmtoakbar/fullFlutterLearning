@@ -3,6 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:learn_getx_bloc_riverpod/chatApp/auth.dart';
 import 'package:learn_getx_bloc_riverpod/chatApp/initiaChat.dart';
 import 'package:learn_getx_bloc_riverpod/chatApp/variable/globalVariable.dart';
+import 'package:learn_getx_bloc_riverpod/features/practice/first.dart';
+import 'package:learn_getx_bloc_riverpod/features/practice/second.dart';
 import 'chatApp/screens/chat_screen.dart';
 
 Future<void> main() async {
