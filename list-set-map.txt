@@ -1,0 +1,338 @@
+🧩 1. List in Dart
+
+A List is an ordered collection of items (like an array in other languages).
+
+// Fixed-length list
+// so this list is fixed
+final growable = List<int>(3);
+var fixedList = List<int>.filled(3, 0);
+print(fixedList); // [0, 0, 0]
+final example = List<int>.filled(5, 1, growable: true);
+// Now example has this content: [1, 1, 1, 1, 1]
+
+
+// Growable list
+// so this list is growable
+final growable = List<int>();
+growable.length = 5;
+var growableList = [1, 2, 3];
+print(growableList); // [1, 2, 3]
+
+
+// Empty growable list
+var emptyList = <String>[];
+
+
+• unmodifiable() It returns a copy of the given list in which you cannot call add, remove
+or other methods that would modify its content.
+var example = List<int>.unmodifiable([1,2,3]);
+example.add(4); // Runtime error
+
+
+• generate() Creates a list of the given length and fills each position according with the value
+returned by the generator. This example fills the array with the power of each number.
+var example = List<int>.generate(5, (int i) => i*i);
+// Now example has this content: [0, 1, 4, 9, 16]
+
+
+🧠 Common Properties
+
+| Property                 | Description            | Example                  |
+| ------------------------ | ---------------------- | ------------------------ |
+| `length`                 | Number of elements     | `list.length`            |
+| `first`                  | First element          | `list.first`             |
+| `last`                   | Last element           | `list.last`              |
+| `isEmpty` / `isNotEmpty` | Check if list is empty | `list.isEmpty`           |
+| `reversed`               | Reverse order iterable | `list.reversed.toList()` |
+
+
+🔧 Main Functions
+
+| Function                   | Description                                     | Example                          |
+| -------------------------- | ----------------------------------------------- | -------------------------------- |
+| `add()`                    | Adds one item                                   | `list.add(5)`                    |
+| `addAll()`                 | Adds multiple items                             | `list.addAll([6,7])`             |
+| `insert(index, value)`     | Insert at specific index                        | `list.insert(1, 10)`             |
+| `insertAll(index, values)` | Insert multiple values                          | `list.insertAll(2, [11,12])`     |
+| `remove(value)`            | Removes first matching element                  | `list.remove(3)`                 |
+| `removeAt(index)`          | Removes at specific index                       | `list.removeAt(1)`               |
+| `removeLast()`             | Removes last element                            | `list.removeLast()`              |
+| `removeWhere(condition)`   | Removes elements that satisfy condition         | `list.removeWhere((x) => x < 5)` |
+| `retainWhere(condition)`   | Keeps only elements that satisfy condition      | `list.retainWhere((x) => x > 5)` |
+| `clear()`                  | Removes all elements                            | `list.clear()`                   |
+| `contains(value)`          | Check if contains value                         | `list.contains(5)`               |
+| `indexOf(value)`           | Get first index of value                        | `list.indexOf(3)`                |
+| `lastIndexOf(value)`       | Get last index of value                         | `list.lastIndexOf(3)`            |
+| `sort()`                   | Sort the list                                   | `list.sort()`                    |
+| `shuffle()`                | Randomly shuffle                                | `list.shuffle()`                 |
+| `sublist(start, [end])`    | Get range of elements                           | `list.sublist(1,3)`              |
+| `map()`                    | Transform each element                          | `list.map((e) => e * 2)`         |
+| `where()`                  | Filter items                                    | `list.where((e) => e > 5)`       |
+| `fold()`                   | Reduce list to a single value                   | `list.fold(0, (a, b) => a + b)`  |
+| `reduce()`                 | Similar to fold without initial value           | `list.reduce((a, b) => a + b)`   |
+| `any()`                    | Returns true if any element satisfies condition | `list.any((e) => e > 10)`        |
+| `every()`                  | True if all satisfy condition                   | `list.every((e) => e > 0)`       |
+| `forEach()`                | Iterates through list                           | `list.forEach((e) => print(e))`  |
+
+
+void main() {
+  var numbers = [1, 2, 3, 4, 5];
+
+  numbers.add(6);
+  numbers.insert(2, 99);
+  numbers.removeWhere((n) => n.isEven);
+  
+  print(numbers); // [1, 99, 3, 5]
+  
+  var doubled = numbers.map((e) => e * 2).toList();
+  print(doubled); // [2, 198, 6, 10]
+}
+
+
+
+🧱 2. Set in Dart
+
+A Set is an unordered collection of unique items — duplicates are automatically removed.
+
+var set1 = {1, 2, 3};
+var set2 = <String>{};
+
+
+🧠 Common Properties
+
+| Property                 | Description        | Example       |
+| ------------------------ | ------------------ | ------------- |
+| `length`                 | Number of elements | `set.length`  |
+| `isEmpty` / `isNotEmpty` | Check if empty     | `set.isEmpty` |
+| `first` / `last`         | Access first/last  | `set.first`   |
+
+
+🔧 Main Functions
+
+| Function         | Description               | Example                   |
+| ---------------- | ------------------------- | ------------------------- |
+| `add()`          | Adds one item             | `set.add(4)`              |
+| `addAll()`       | Adds multiple items       | `set.addAll([5, 6])`      |
+| `remove()`       | Removes an item           | `set.remove(3)`           |
+| `contains()`     | Checks presence           | `set.contains(2)`         |
+| `clear()`        | Removes all               | `set.clear()`             |
+| `union()`        | Combine two sets          | `set1.union(set2)`        |
+| `intersection()` | Common items              | `set1.intersection(set2)` |
+| `difference()`   | Items in one not in other | `set1.difference(set2)`   |
+| `forEach()`      | Iterate through set       | `set.forEach(print)`      |
+
+
+void main() {
+  var a = {1, 2, 3, 4};
+  var b = {3, 4, 5, 6};
+  
+  print(a.union(b)); // {1, 2, 3, 4, 5, 6}
+  print(a.intersection(b)); // {3, 4}
+  print(a.difference(b)); // {1, 2}
+}
+
+
+🗺️ 3. Map in Dart
+
+A Map is a collection of key–value pairs, like JSON objects.
+
+var map1 = {'name': 'Amit', 'age': 25};
+var map2 = <String, dynamic>{};
+
+
+final m = <int, String>{
+0: "A",
+1: "B",
+2: "C"
+};
+Map.unmodifiable() creates an unmodifiable copy of the map while UnmodifiableMapView()
+just takes a reference (no copies are made). There are two ways to insert new pairs in the
+map:
+• Use the putIfAbsent() method to insert a new pair of values only if the key is not already
+in the list.
+final example = <int, String>{
+    };
+0: "A",
+1: "B"
+// The key '0' is already present, "C" not added
+example.putIfAbsent(0, () => "C");
+// The key '6' is not present, "C" successfully added
+example.putIfAbsent(6, () => "C");
+The first parameter is the desired key while the second one is a no-param function returning
+the value to be inserted.
+• Use brackets [] to add an element at the given index without checking if the key is already
+in the collection.
+final example = <int, String>{
+0: "A",
+1: "B"
+};
+// "A" has '0' as key and it's replaced with "C".
+// Now the map contains {0: "C", 1: "B"}
+example[0] = "C";
+// The key '6' is not present, "C" gets added
+example[6] = "C";
+Maps doesn’t allow duplicate keys. When we do example[0] = "C" there are no errors
+because the element with key 0 is updated with the new value.
+Retrieving a value from a map is fairly simple: var v = example[0];. If you pass a key that’s
+not in the map, a null reference is returned.
+final example = <int, String>{
+0: "A",
+1: "B"
+};
+final ex1 = example[0]; // ex1 = "A"
+final ex1 = example[8]; // ex1 = null
+In general it’d be better using bool containsKey(T key); before accessing the item as it tells
+
+
+🧠 Common Properties
+
+| Property                 | Description        | Example       |
+| ------------------------ | ------------------ | ------------- |
+| `keys`                   | Returns all keys   | `map.keys`    |
+| `values`                 | Returns all values | `map.values`  |
+| `length`                 | Number of entries  | `map.length`  |
+| `isEmpty` / `isNotEmpty` | Check if empty     | `map.isEmpty` |
+
+
+🔧 Main Functions
+
+| Function          | Description             | Example                                                    |
+| ----------------- | ----------------------- | ---------------------------------------------------------- |
+| `[]`              | Access value by key     | `map['name']`                                              |
+| `[]=`             | Add or update key-value | `map['city'] = 'Delhi'`                                    |
+| `addAll()`        | Add multiple entries    | `map.addAll({'country':'India'})`                          |
+| `remove(key)`     | Remove entry            | `map.remove('age')`                                        |
+| `containsKey()`   | Check key exists        | `map.containsKey('name')`                                  |
+| `containsValue()` | Check value exists      | `map.containsValue('Amit')`                                |
+| `clear()`         | Remove all entries      | `map.clear()`                                              |
+| `forEach()`       | Loop over entries       | `map.forEach((k,v)=>print('$k: $v'))`                      |
+| `map()`           | Transform entries       | `map.map((k,v)=> MapEntry(k, v.toString().toUpperCase()))` |
+| `putIfAbsent()`   | Adds key if not present | `map.putIfAbsent('email', ()=>'amit@mail.com')`            |
+| `update()`        | Update value for key    | `map.update('age', (val)=> val+1)`                         |
+
+
+void main() {
+  var person = {
+    'name': 'Amit',
+    'age': 25,
+    'city': 'Delhi'
+  };
+
+  person['country'] = 'India';
+  person.update('age', (value) => value + 1);
+  person.putIfAbsent('email', () => 'amit@mail.com');
+  
+  print(person);
+  // {name: Amit, age: 26, city: Delhi, country: India, email: amit@mail.com}
+
+  person.forEach((key, value) {
+    print('$key → $value');
+  });
+}
+
+
+⚡ Bonus: Conversions Between List, Set, and Map
+
+| Conversion          | Code Example                                                   |
+| ------------------- | -------------------------------------------------------------- |
+| List → Set          | `myList.toSet()`                                               |
+| Set → List          | `mySet.toList()`                                               |
+| List of Pairs → Map | `Map.fromIterable(list, key: (e) => e[0], value: (e) => e[1])` |
+| Map Keys → List     | `map.keys.toList()`                                            |
+| Map Values → List   | `map.values.toList()`                                          |
+
+
+🧭 Summary Table
+
+| Collection | Ordered | Duplicates    | Access | Use Case           |
+| ---------- | ------- | ------------- | ------ | ------------------ |
+| **List**   | ✅ Yes   | ✅ Yes         | Index  | Store ordered data |
+| **Set**    | ❌ No    | ❌ No          | Value  | Store unique items |
+| **Map**    | ❌ No    | ❌ Keys unique | Key    | Key-value pairs    |
+
+
+
+###############Transform method#######################3
+void main() {
+// Generate a list of 20 items using a factory
+final list = List<int>.generate(20, (i) => i);
+// Return a new list of even numbers
+final List<String> other = list
+.where((int value) => value % 2 == 0) // 1.
+.map((int value) => value.toString()) // 2.
+.toList();
+// 3.
+}
+In this example we’re creating a list containing numbers from 0 to 19 using the generate factory
+constructor. The interesting part is how we’ve built other so that it contains only strings
+representing even numbers.
+1. The where() method iterates across the entire collection and returns a boolean expression.
+Here we analyze each element of the list, represented by int value, and we discard it in
+case it’s not even. This method is a "filter" that adds values only if the boolean expression
+returns true.
+2. The map() method transforms a type into another. Since other must be a list of strings,
+we transform each filtered element (represented by int value) into a String value.
+3. Now that we have a filtered list of transformed values, the terminal function returns an
+instance of a list.
+
+
+• Intermediates. This is a category of functions that can be chained like you’ve seen above
+to create complex expressions. Most of them accept a function whose parameter is the
+element of the collection being accessed.
+– where(): goes through the entire list and discards elements that evaluate the condition
+to false.
+– map(): transforms the element from a type to another.
+– skip(): skips the first n elements of the source collection.
+– followedBy(): concatenates this container with another one, passed as parameter.
+• Terminals. This is a category of function that can only be called at the end of the chain
+to return a value or an object.
+– toList()/toSet()/toMap(): gathers the elaborated data through the "pipes" and
+returns an instance of a list/set/map.
+– every(): returns a boolean indicating if every element of the collection satisfies the
+given condition.
+– contains(): returns true or false whether the collection contains or not the object
+you’re looking for.
+– reduce(): reduces a collection to a single value which can be the result of operations
+in the elements of the container. You cannot use reduce() on empty collections. For
+example:
+final list = <int>[1, 2, 3, 4, 5];
+final sum = list.reduce((int a, int b) => a + b);
+print(sum); // 15
+The variable sum contains the sum of the elements in the list since reduce((a,b) => c)
+takes 2 elements of the source (a, b) and performs the given action on them (in this
+case, it sums the values).
+
+– fold(). It’s very similar to reduce() but it asks for an initial value and the returned
+type doesn’t have to be the same of the collection.
+final list = <int>[1, 2, 3, 4, 5];
+final sum = list.fold(0, (int a, int b) => a + b);
+print(sum); // 15
+Both reduce() and fold() can do the same things but the latter is more powerful. First of all,
+fold() can define a custom initial value for the operations:
+final list = <int>[1, 2, 3, 4, 5];
+final sum1 = list.fold(0, (int a, int b) => a + b);
+final sum2 = list.fold(5, (int a, int b) => a + b);
+print(sum1); // 15
+print(sum2); // 20
+With fold() you can perform operations on different data types while with reduce() you cannot.
+In this example, we’re computing the sum of the lengths of strings in a collection.
+final list = ['hello', 'Dart', '!'];
+final value = list.fold(0, (int count, String item) => count + item.length);
+print(value); // 10
+count has the same type of the initial value (0 in this case, which is an int) and item represents
+an object in the collection. The returned value of the function must match the type of the initial
+value. You can’t do the same in the other way:
+final list = ['hello', 'Dart', '!'];
+// It doesn't compile
+list.reduce((String a, String b) => a.length + b.length);
+print(value);
+This version doesn’t work because reduce() expects the return type of the callback to be a
+String, the same type of the container. With fold() you don’t have this constrain: it will
+always work. In reality, reduce() can be seen as a shortcut of the following:
+final withReduce = list.reduce(someCallback);
+
+
+final withFold = list.skip(1).fold(list.first, someCallback);
+The two versions are equivalent but withReduce is just shorter. We strongly encourage you to
+use this fluent syntax when you have to work on collections rather than using temporary variables
+and/or conditional statements.
