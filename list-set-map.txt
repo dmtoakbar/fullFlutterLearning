@@ -4,7 +4,6 @@ A List is an ordered collection of items (like an array in other languages).
 
 // Fixed-length list
 // so this list is fixed
-final growable = List<int>(3);
 var fixedList = List<int>.filled(3, 0);
 print(fixedList); // [0, 0, 0]
 final example = List<int>.filled(5, 1, growable: true);
@@ -13,10 +12,14 @@ final example = List<int>.filled(5, 1, growable: true);
 
 // Growable list
 // so this list is growable
-final growable = List<int>();
+final growable = <int?>();
 growable.length = 5;
 var growableList = [1, 2, 3];
 print(growableList); // [1, 2, 3]
+
+ final growable = List<int>.empty();
+  growable.add(6);
+  print(growable);
 
 
 // Empty growable list
@@ -87,6 +90,96 @@ void main() {
   var doubled = numbers.map((e) => e * 2).toList();
   print(doubled); // [2, 198, 6, 10]
 }
+
+
+🧩 1. List.castFrom()
+Purpose:
+Creates a new list view that treats an existing list as a list of a different type (without copying the elements).
+
+List<R> List.castFrom<S, R>(List<S> source)
+
+void main() {
+  List<num> numbers = [1, 2, 3];
+  List<int> ints = List.castFrom<num, int>(numbers);
+
+  print(ints); // [1, 2, 3]
+}
+
+⚠️ Note: It doesn’t copy data — it reinterprets the type.
+If an element doesn’t match the cast, you’ll get a runtime error.
+
+🧩 2. List.copyRange()
+Purpose:
+Copies a range of elements from one list into another.
+📘 Syntax:
+
+void List.copyRange<T>(List<T> target, int at, List<T> source,
+    [int? start, int? end])
+
+void main() {
+  var target = [0, 0, 0, 0, 0];
+  var source = [10, 20, 30];
+
+  List.copyRange(target, 1, source); // copy source into target starting at index 1
+  print(target); // [0, 10, 20, 30, 0]
+}
+
+
+🧩 3. List.from()
+Purpose:
+Creates a new list by copying elements from another iterable.
+📘 Syntax:
+
+List<E>.from(Iterable elements, {bool growable = true})
+
+void main() {
+  var set = {1, 2, 3};
+  var list = List<int>.from(set);
+  print(list); // [1, 2, 3]
+}
+
+📙 Tip:
+Use List.from() when you want to clone an iterable (copy, not reference).
+
+🧩 4. List.of()
+Purpose:
+Similar to List.from(), but type-safe (preserves element types more strictly).
+📘 Syntax:
+
+List<E>.of(Iterable<E> elements, {bool growable = true})
+
+void main() {
+  var original = <int>[1, 2, 3];
+  var copy = List<int>.of(original);
+  print(copy); // [1, 2, 3]
+}
+
+📙 Difference vs from:
+List.from() allows upcasting or downcasting (less type strict).
+List.of() enforces type constraints (safer).
+
+🧩 5. List.writeIterable()
+Purpose:
+Writes elements from an iterable directly into an existing list (used internally by Dart).
+Not used often in normal Dart code — mostly for performance optimization or custom list logic.
+📗 Example:
+
+void main() {
+  var list = List<int>.filled(5, 0);
+  List.writeIterable(list, 0, [10, 20, 30]);
+  print(list); // [10, 20, 30, 0, 0]
+}
+
+🧩 Summary Table
+
+| Constructor / Method   | Description                                        | Example                                | Growable      |
+| ---------------------- | -------------------------------------------------- | -------------------------------------- | ------------- |
+| `List.castFrom()`      | Reinterprets an existing list as a different type  | `List.castFrom<num, int>(list)`        | No            |
+| `List.copyRange()`     | Copies a range of elements between lists           | `List.copyRange(dest, 0, src)`         | N/A           |
+| `List.from()`          | Creates a new list from any iterable (copies data) | `List.from(set)`                       | Yes (default) |
+| `List.of()`            | Type-safe version of `from()`                      | `List.of(list)`                        | Yes (default) |
+| `List.writeIterable()` | Writes iterable data into an existing list         | `List.writeIterable(list, 0, [1,2,3])` | No            |
+
 
 
 
