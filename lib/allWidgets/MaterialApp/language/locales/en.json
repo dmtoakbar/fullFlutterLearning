@@ -1,0 +1,14 @@
+{
+  "hello": "Hello",
+  "welcome": "Welcome to our app!",
+  "language": "Language",
+  "home": "Home",
+  "profile": "Profile",
+  "settings": "Settings",
+  "choose_language": "Choose Language",
+  "system_default": "System Default",
+  "english": "English",
+  "hindi": "Hindi",
+  "go_to_profile": "Go to Profile",
+  "go_to_settings": "Go to Settings"
+}

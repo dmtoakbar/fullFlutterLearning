@@ -1,0 +1,14 @@
+{
+  "hello": "नमस्ते",
+  "welcome": "हमारे ऐप में आपका स्वागत है!",
+  "language": "भाषा",
+  "home": "होम",
+  "profile": "प्रोफ़ाइल",
+  "settings": "सेटिंग्स",
+  "choose_language": "भाषा चुनें",
+  "system_default": "सिस्टम डिफ़ॉल्ट",
+  "english": "अंग्रेज़ी",
+  "hindi": "हिन्दी",
+  "go_to_profile": "प्रोफ़ाइल पर जाएं",
+  "go_to_settings": "सेटिंग्स पर जाएं"
+}
